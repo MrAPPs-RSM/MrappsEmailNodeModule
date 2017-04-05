@@ -1,0 +1,54 @@
+<!-- Two/Three Even Columns (XS: 1/2) -->
+{% if tdStyle is defined and tdStyle=='three_columns' %}
+    {% set tdClass='column-3' %}
+    {% set imgSize=170 %}
+{% else %}
+    {% if xsInvariate is not empty %}
+        {% set tdClass='column-2 xs_invariate' %}
+    {% else %}
+        {% set tdClass='column-2' %}
+    {% endif %}
+    {% set imgSize=270 %}
+{% endif %}
+<tr>
+    <td align="center" valign="top" style="padding: 10px;">
+        {% if title is defined and title is not empty %}
+            <table cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                    <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; padding: 10px; text-align: left;">
+                        <strong style="color:{{ boldColor }};">{{ title }}</strong>
+                    </td>
+                </tr>
+            </table>
+        {% endif %}
+        <table cellspacing="0" cellpadding="0" border="0" width="100%">
+            <tr>
+                {% for row in rows %}
+                    <td class="{{ tdClass }}">
+                        <table cellspacing="0" cellpadding="0" border="0">
+                            <tr>
+                                <td style="padding: 10px; text-align: center">
+                                    {% if row.link is defined and row.link is not empty %}
+                                        <a href="{{ row.link }}"><img src="{{ row.imageUrl }}" width="{{ imgSize }}"
+                                                                      height="{{ imgSize }}" alt="alt_text" border="0"
+                                                                      class="fluid"></a>
+                                    {% else %}
+                                        <img src="{{ row.imageUrl }}" width="{{ imgSize }}" height="{{ imgSize }}"
+                                             alt="alt_text"
+                                             border="0" class="fluid">
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: {{ textColor }}; padding: 0 10px 10px; text-align: left;"
+                                    class="center-on-narrow">
+                                    {{ row.description | raw }}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                {% endfor %}
+            </tr>
+        </table>
+    </td>
+</tr>

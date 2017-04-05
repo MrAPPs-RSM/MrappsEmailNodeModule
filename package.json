@@ -4,7 +4,8 @@
   "description": "Node module for email",
   "main": "index.js",
   "scripts": {
-    "test": "npm test"
+    "start": "node index.js",
+    "test": "nodeunit ./tests/"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,7 @@
   },
   "homepage": "https://github.com/MrAPPs-RSM/MrappsEmailNodeModule#readme",
   "dependencies": {
-    "nodemailer": "^3.1.8"
+    "nodemailer": "^3.1.8",
+    "twig": "^1.10.4"
   }
 }
