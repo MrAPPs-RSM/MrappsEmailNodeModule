@@ -18,11 +18,7 @@ var Mailer = function () {
 
     var mailer = {
 
-        auth: {
-            service: '', //gmail, hotmail...
-            email: '', //sender email
-            password: '' //sender password
-        },
+        auth: {},
 
         /**
          * Default styles
@@ -35,6 +31,15 @@ var Mailer = function () {
             mainColor: "#333333",
             mainColorHover: "#000000",
             textOnMainColor: "#FFFFFF"
+        },
+
+        /**
+         * Setup base params for SMTP
+         */
+        setup: function(service, email, password) {
+            mailer.auth.service = service;
+            mailer.auth.email = email;
+            mailer.auth.password = password;
         },
 
         /**
@@ -108,53 +113,57 @@ var Mailer = function () {
 
             return new Promise(function (resolve, reject) {
 
-                if (from === null ||
+                //If no setup
+                if (Object.keys(mailer.auth).length === 0) {
+                    reject();
+                } else {
+
+                    if (from === null ||
                     to === null ||
                     emailParts === null ||
                     logoUrl === null ||
                     companyName === null ||
                     street === null
-                ) {
-                    reject();
-                }
-                else {
+                    ) {
+                        reject();
+                    }
+                    else {
 
-                    mailer.composeMail(emailParts, logoUrl, companyName, street, otherInfo)
-                        .then(function (body) {
+                        mailer.composeMail(emailParts, logoUrl, companyName, street, otherInfo)
+                            .then(function (body) {
 
-                            /** Setup email data with unicode symbols */
-                            var mailOptions = {
-                                from: from,
-                                to: to.join(','),
-                                subject: subject,
-                                html: body
-                            };
+                                /** Setup email data with unicode symbols */
+                                var mailOptions = {
+                                    from: from,
+                                    to: to.join(','),
+                                    subject: subject,
+                                    html: body
+                                };
 
-                            mailer.transport = nodemailer.createTransport("SMTP", {
-                                service: mailer.service,
-                                auth: {
-                                    user: mailer.email,
-                                    pass: mailer.password
-                                }
+                                mailer.transport = nodemailer.createTransport("SMTP", {
+                                    service: mailer.service,
+                                    auth: {
+                                        user: mailer.email,
+                                        pass: mailer.password
+                                    }
+                                });
+
+                                /** Send mail with defined transport object */
+                                mailer.transport.sendMail(mailOptions, function (error, info) {
+
+                                    if (error) {
+                                        return error;
+                                    } else {
+                                        console.log('Message %s sent: %s', info.messageId, info.response);
+                                        return true;
+                                    }
+
+                                });
+                            })
+                            .catch(function (error) {
+                                reject(error);
                             });
-
-                            /** Send mail with defined transport object */
-                            mailer.transport.sendMail(mailOptions, function (error, info) {
-
-                                if (error) {
-                                    return error;
-                                } else {
-                                    console.log('Message %s sent: %s', info.messageId, info.response);
-                                    return true;
-                                }
-
-                            });
-                        })
-                        .catch(function (error) {
-                            reject(error);
-                        });
-
-
+                    }
                 }
             });
         },
