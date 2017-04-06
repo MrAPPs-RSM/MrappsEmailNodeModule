@@ -51,7 +51,8 @@ var Mailer = function () {
             mailer.config.password = password;
         },
 
-        /** Override default style
+        /**
+         * Override default style
          *
          * @param style object
          * */
@@ -157,6 +158,7 @@ var Mailer = function () {
                                     html: body
                                 };
 
+                                /** Creating SMTP transport */
                                 mailer.transport = nodemailer.createTransport(
                                     {
                                         host: mailer.config.host,

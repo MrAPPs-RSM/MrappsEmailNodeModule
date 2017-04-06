@@ -8,6 +8,8 @@ Email handler for node.js
 
 ## Installation:
 
+
+
 ## Usage:
 
 ```javascript
@@ -28,7 +30,7 @@ mailer.sendMail(
     logoUrl,
     companyName,
     street,
-    otherInfo
+    otherInfo //optional
 )
     .then(function (info) {
         console.log('Message %s sent: %s', info.messageId, info.response);
