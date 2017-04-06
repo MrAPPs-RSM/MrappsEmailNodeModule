@@ -20,49 +20,39 @@ package.json
 
 ## Usage:
 
-First, add in your config.json some parameters
+First, create a configuration file with the following parameters
 ```json
 {
-    "mailer": {
-        "host": "host_name",
-        "port": "host_port",
-        "user": "user_email",
-        "password": "user_password"
-    }
+  "host": "host_name",
+  "port": "host_port",
+  "user": "user_email",
+  "password": "user_password"
 }
 ```
 
-### Usage with [kontainer-di](https://github.com/redradix/kontainer)
-
-container.js
-```javascript
-var container = require('kontainer-di');
-
-container.register('mailer', ['settings'], require('mrapps-mailer'));
-```
-
-And then use the mailer as a module in other files
-```javascript
-var mailer  = container.startModule('mailer', []);
-```
-
-### Simple usage
+And then pass the config object to the constructor
 
 ```javascript
 var Mailer = require('mrapps-mailer');
-var mailer = new Mailer(config.mailer);
+var mailer = new Mailer(config);
 ```
 
 ## Example:
 
 ```javascript
-var mailer;
-
-mailer = new Mailer(config.mailer);
-//or
-mailer  = container.startModule('mailer', []);
+var mailer = new Mailer(config.mailer);
 
 //Optional (to override template colors)
+var style = {
+    backgroundColor: "#F5F5F5",
+    contentColor: "#FFFFFF",
+    boldColor: "#000000",
+    textColor: "#555555",
+    mainColor: "#333333",
+    mainColorHover: "#000000",
+    textOnMainColor: "#FFFFFF"
+};
+
 mailer.setStyle(style);
 
 //Examples for every supported html part of mailer
