@@ -1,6 +1,6 @@
 {
   "name": "mrapps-mailer",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Node module for email",
   "main": "mailer.js",
   "scripts": {
