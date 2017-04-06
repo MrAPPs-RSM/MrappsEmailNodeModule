@@ -242,7 +242,6 @@
                             {% set partTitle = part.title|default(null) %}
                             {% for row in part.rows %}
                                 {% if loop.index0%3==0 %}
-
                                     {% if loop.last %}
                                         {% set rowCells=[row] %}
                                     {% elseif loop.index<=loop.length-3 %}
@@ -251,7 +250,7 @@
                                         {% set rowCells=[row,part.rows[loop.index0+1]] %}
                                     {% endif %}
 
-                                    {% include './parts/even_cols_xs.html.twig' with {'title':partTitle,'rows':row_cells|default(null),'tdStyle':'three_columns'} %}
+                                    {% include './parts/even_cols_xs.html.twig' with {'title':partTitle,'rows':rowCells|default(null),'tdStyle':'three_columns'} %}
                                     {% set partTitle = null %}
                                 {% endif %}
                             {% endfor %}

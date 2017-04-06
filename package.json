@@ -4,7 +4,6 @@
   "description": "Node module for email",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
     "test": "nodeunit ./tests/"
   },
   "repository": {

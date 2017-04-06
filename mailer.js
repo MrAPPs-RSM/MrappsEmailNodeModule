@@ -3,27 +3,27 @@
 var twig = require('twig');
 var nodemailer = require('nodemailer');
 
-var settings = {
-    parts: {
-        BgImageWithText: "bg_image_with_text",
-        TwoEvenColsXs: "two_even_cols_xs",
-        ThreeEvenColsXs: "three_even_cols_xs",
-        Image: "image",
-        OneColText: "one_col_text",
-        ThumbnailText: "thumbnail_text"
-    }
-};
-
 var Mailer = function () {
+
+    /** Twig extension */
+    twig.extendFilter("truncate", function (string, length) {
+        return string.substring(0, length) + '...';
+    });
 
     var mailer = {
 
-        auth: {},
+        /** Supported email parts */
+        emailParts: {
+            BgImageWithText: "bg_image_with_text",
+            TwoEvenColsXs: "two_even_cols_xs",
+            ThreeEvenColsXs: "three_even_cols_xs",
+            Image: "image",
+            OneColText: "one_col_text",
+            ThumbnailText: "thumbnail_text"
+        },
 
-        /**
-         * Default styles
-         */
-        styles: {
+        /** Default styles */
+        style: {
             backgroundColor: "#F5F5F5",
             contentColor: "#FFFFFF",
             boldColor: "#000000",
@@ -33,13 +33,30 @@ var Mailer = function () {
             textOnMainColor: "#FFFFFF"
         },
 
+        config: {},
+        transport: {},
+
         /**
          * Setup base params for SMTP
+         *
+         * @param host
+         * @param port
+         * @param user
+         * @param password
          */
-        setup: function(service, email, password) {
-            mailer.auth.service = service;
-            mailer.auth.email = email;
-            mailer.auth.password = password;
+        setConfig: function (host, port, user, password) {
+            mailer.config.host = host;
+            mailer.config.port = port;
+            mailer.config.user = user;
+            mailer.config.password = password;
+        },
+
+        /** Override default style
+         *
+         * @param style object
+         * */
+        setStyle: function (style) {
+            mailer.style = style;
         },
 
         /**
@@ -58,24 +75,24 @@ var Mailer = function () {
 
             return new Promise(function (resolve, reject) {
 
-                if (emailParts === null ||
-                    logoUrl === null ||
-                    companyName === null ||
-                    street === null
+                if (emailParts === undefined || emailParts === null ||
+                    logoUrl === undefined || logoUrl === null ||
+                    companyName === undefined || companyName === null ||
+                    street === undefined || street === null
                 ) {
-                    reject();
+                    reject("Some params cannot be empty");
                 } else {
 
                     twig.renderFile('./views/index.html.twig',
                         {
                             //Email style
-                            backgroundColor: mailer.styles.backgroundColor,
-                            contentColor: mailer.styles.contentColor,
-                            boldColor: mailer.styles.boldColor,
-                            textColor: mailer.styles.textColor,
-                            mainColor: mailer.styles.mainColor,
-                            mainColorHover: mailer.styles.mainColorHover,
-                            textOnMainColor: mailer.styles.textOnMainColor,
+                            backgroundColor: mailer.style.backgroundColor,
+                            contentColor: mailer.style.contentColor,
+                            boldColor: mailer.style.boldColor,
+                            textColor: mailer.style.textColor,
+                            mainColor: mailer.style.mainColor,
+                            mainColorHover: mailer.style.mainColorHover,
+                            textOnMainColor: mailer.style.textOnMainColor,
                             //Email data
                             logoUrl: logoUrl,
                             companyName: companyName,
@@ -114,18 +131,18 @@ var Mailer = function () {
             return new Promise(function (resolve, reject) {
 
                 //If no setup
-                if (Object.keys(mailer.auth).length === 0) {
-                    reject();
+                if (Object.keys(mailer.config).length === 0) {
+                    reject("No config set");
                 } else {
 
                     if (from === null ||
-                    to === null ||
-                    emailParts === null ||
-                    logoUrl === null ||
-                    companyName === null ||
-                    street === null
+                        to === null ||
+                        emailParts === null ||
+                        logoUrl === null ||
+                        companyName === null ||
+                        street === null
                     ) {
-                        reject();
+                        reject("Some params cannot be empty");
                     }
                     else {
 
@@ -140,22 +157,24 @@ var Mailer = function () {
                                     html: body
                                 };
 
-                                mailer.transport = nodemailer.createTransport("SMTP", {
-                                    service: mailer.service,
-                                    auth: {
-                                        user: mailer.email,
-                                        pass: mailer.password
+                                mailer.transport = nodemailer.createTransport(
+                                    {
+                                        host: mailer.config.host,
+                                        port: mailer.config.port,
+                                        auth: {
+                                            user: mailer.config.user,
+                                            pass: mailer.config.password
+                                        }
                                     }
-                                });
+                                );
 
                                 /** Send mail with defined transport object */
                                 mailer.transport.sendMail(mailOptions, function (error, info) {
 
                                     if (error) {
-                                        return error;
+                                        reject(error);
                                     } else {
-                                        console.log('Message %s sent: %s', info.messageId, info.response);
-                                        return true;
+                                        resolve(info);
                                     }
 
                                 });

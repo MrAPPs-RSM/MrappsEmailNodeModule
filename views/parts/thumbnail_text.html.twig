@@ -25,13 +25,13 @@
                                 style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: {{ textColor }}; padding: 10px; text-align: left;"
                                 class="center-on-narrow">
                                 {% if title is defined and title is not empty %}
-                                    <strong style="color:{{ boldColor }};">{{ title | tronca(88) }}</strong>
+                                    <strong style="color:{{ boldColor }};">{{ title | truncate(88) }}</strong>
                                     <br/>
                                 {% endif %}
                                 {% if link is defined and link is not empty %}
-                                    {{ description | tronca(103) | raw }}
+                                    {{ description | truncate(103) | raw }}
                                 {% else %}
-                                    {{ description | tronca(253) | raw }}
+                                    {{ description | truncate(253) | raw }}
                                 {% endif %}
 
                                 {% if link is defined and link is not empty %}
