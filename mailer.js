@@ -3,7 +3,14 @@
 var twig = require('twig');
 var nodemailer = require('nodemailer');
 
-var Mailer = function () {
+var Mailer = function (config) {
+
+    if (config === undefined || !('host' in config
+        && 'port' in config
+        && 'user' in config
+        && 'password' in config)) {
+        throw "Invalid mailer configuration data";
+    }
 
     /** Twig extension */
     twig.extendFilter("truncate", function (string, length) {
@@ -11,45 +18,6 @@ var Mailer = function () {
     });
 
     var mailer = {
-
-        /** Supported email parts */
-        emailParts: {
-            BgImageWithText: "bg_image_with_text",
-            TwoEvenColsXs: "two_even_cols_xs",
-            ThreeEvenColsXs: "three_even_cols_xs",
-            Image: "image",
-            OneColText: "one_col_text",
-            ThumbnailText: "thumbnail_text"
-        },
-
-        /** Default styles */
-        style: {
-            backgroundColor: "#F5F5F5",
-            contentColor: "#FFFFFF",
-            boldColor: "#000000",
-            textColor: "#555555",
-            mainColor: "#333333",
-            mainColorHover: "#000000",
-            textOnMainColor: "#FFFFFF"
-        },
-
-        config: {},
-        transport: {},
-
-        /**
-         * Setup base params for SMTP
-         *
-         * @param host
-         * @param port
-         * @param user
-         * @param password
-         */
-        setConfig: function (host, port, user, password) {
-            mailer.config.host = host;
-            mailer.config.port = port;
-            mailer.config.user = user;
-            mailer.config.password = password;
-        },
 
         /**
          * Override default style
@@ -131,69 +99,80 @@ var Mailer = function () {
 
             return new Promise(function (resolve, reject) {
 
-                //If no setup
-                if (Object.keys(mailer.config).length === 0) {
-                    reject("No config set");
-                } else {
+                if (from === undefined || from === null ||
+                    to === undefined || to === null ||
+                    emailParts === undefined || emailParts === null ||
+                    logoUrl === undefined || logoUrl === null ||
+                    companyName === undefined || companyName === null ||
+                    street === undefined || street === null
+                ) {
+                    reject("Some params cannot be empty");
+                }
+                else {
 
-                    if (from === null ||
-                        to === null ||
-                        emailParts === null ||
-                        logoUrl === null ||
-                        companyName === null ||
-                        street === null
-                    ) {
-                        reject("Some params cannot be empty");
-                    }
-                    else {
+                    mailer.composeMail(emailParts, logoUrl, companyName, street, otherInfo)
+                        .then(function (body) {
 
-                        mailer.composeMail(emailParts, logoUrl, companyName, street, otherInfo)
-                            .then(function (body) {
+                            /** Setup email data */
+                            var mailOptions = {
+                                from: from,
+                                to: to.join(','),
+                                subject: subject,
+                                html: body
+                            };
 
-                                /** Setup email data with unicode symbols */
-                                var mailOptions = {
-                                    from: from,
-                                    to: to.join(','),
-                                    subject: subject,
-                                    html: body
-                                };
+                            /** Send mail with defined transport object */
+                            mailer.transport.sendMail(mailOptions, function (error, info) {
 
-                                /** Creating SMTP transport */
-                                mailer.transport = nodemailer.createTransport(
-                                    {
-                                        host: mailer.config.host,
-                                        port: mailer.config.port,
-                                        auth: {
-                                            user: mailer.config.user,
-                                            pass: mailer.config.password
-                                        }
-                                    }
-                                );
+                                if (error) {
+                                    reject(error);
+                                } else {
+                                    resolve(info);
+                                }
 
-                                /** Send mail with defined transport object */
-                                mailer.transport.sendMail(mailOptions, function (error, info) {
-
-                                    if (error) {
-                                        reject(error);
-                                    } else {
-                                        resolve(info);
-                                    }
-
-                                });
-                            })
-                            .catch(function (error) {
-                                reject(error);
                             });
-                    }
+                        })
+                        .catch(function (error) {
+                            reject(error);
+                        });
                 }
             });
-        },
-
-        /** Shut down the connection pool, no more messages. */
-        closeTransport: function () {
-            mailer.transport.close();
         }
     };
+
+    /** Supported email parts */
+    mailer.emailParts = {
+        BgImageWithText: "bg_image_with_text",
+        TwoEvenColsXs: "two_even_cols_xs",
+        ThreeEvenColsXs: "three_even_cols_xs",
+        Image: "image",
+        OneColText: "one_col_text",
+        ThumbnailText: "thumbnail_text"
+    };
+
+    /** Default style */
+    mailer.style = {
+        backgroundColor: "#F5F5F5",
+        contentColor: "#FFFFFF",
+        boldColor: "#000000",
+        textColor: "#555555",
+        mainColor: "#333333",
+        mainColorHover: "#000000",
+        textOnMainColor: "#FFFFFF"
+    };
+
+    /** Creating SMTP transport */
+    mailer.config = config;
+    mailer.transport = nodemailer.createTransport(
+        {
+            host: mailer.config.host,
+            port: mailer.config.port,
+            auth: {
+                user: mailer.config.user,
+                pass: mailer.config.password
+            }
+        }
+    );
 
     return mailer;
 };

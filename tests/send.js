@@ -1,30 +1,14 @@
 var Mailer = require('./../mailer');
-
-module.exports.testSendFailNoConfig = function (test) {
-
-    var mailer = new Mailer();
-
-    mailer.sendMail()
-        .then(function () {
-            test.ok(false);
-            test.done();
-        })
-        .catch(function (error) {
-            test.equal(error, 'No config set');
-            test.done();
-        });
+var config = {
+    host: "ssl0.ovh.net",
+    port: 587,
+    user: "luca@mr-apps.com",
+    password: "Mr?APP2015s!30"
 };
 
-module.exports.testSendFailEmpty = function (test) {
+var mailer = new Mailer(config);
 
-    var mailer = new Mailer();
-
-    var host = "ssl0.ovh.net";
-    var port = 587;
-    var user = "luca@mr-apps.com";
-    var password = "Mr?APP2015s!30";
-
-    mailer.setConfig(host, port, user, password);
+module.exports.testSendFail = function (test) {
 
     mailer.sendMail()
         .then(function () {
@@ -38,15 +22,6 @@ module.exports.testSendFailEmpty = function (test) {
 };
 
 module.exports.testSendOk = function (test) {
-
-    var mailer = new Mailer();
-
-    var host = "ssl0.ovh.net";
-    var port = 587;
-    var user = "luca@mr-apps.com";
-    var password = "Mr?APP2015s!30";
-
-    mailer.setConfig(host, port, user, password);
 
     var emailParts = [
         //Image
@@ -141,7 +116,7 @@ module.exports.testSendOk = function (test) {
 
     mailer.sendMail(
         "Subject",
-        user,
+        config.user,
         ["damian@mr-apps.com"],
         emailParts,
         logoUrl,

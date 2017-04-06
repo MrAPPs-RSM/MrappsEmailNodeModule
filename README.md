@@ -20,45 +20,50 @@ package.json
 
 ## Usage:
 
+First, add in your config.json some parameters
+```json
+{
+    "mailer": {
+        "host": "host_name",
+        "port": "host_port",
+        "user": "user_email",
+        "password": "user_password"
+    }
+}
+```
+
+### Usage with [kontainer-di](https://github.com/redradix/kontainer)
+
+container.js
+```javascript
+var container = require('kontainer-di');
+
+container.register('mailer', ['settings'], require('mrapps-mailer'));
+```
+
+And then use the mailer as a module in other files
+```javascript
+var mailer  = container.startModule('mailer', []);
+```
+
+### Simple usage
+
 ```javascript
 var Mailer = require('mrapps-mailer');
-var mailer = new Mailer();
-
-//Required
-mailer.setConfig(host, port, user, password);
-
-//Optional (to override template colors)
-mailer.setStyle(style);
-
-mailer.sendMail(
-    subject,
-    from,
-    to,
-    emailParts,
-    logoUrl,
-    companyName,
-    street,
-    otherInfo //optional
-)
-    .then(function (info) {
-        console.log('Message %s sent: %s', info.messageId, info.response);
-     })
-     .catch(function (error) {
-        console.log(error);
-     })
+var mailer = new Mailer(config.mailer);
 ```
 
 ## Example:
 
 ```javascript
-var mailer = new Mailer();
+var mailer;
 
-var host = "host_name";
-var port = "host_port";
-var user = "user_email";
-var password = "user_password";
+mailer = new Mailer(config.mailer);
+//or
+mailer  = container.startModule('mailer', []);
 
-mailer.setConfig(host, port, user, password);
+//Optional (to override template colors)
+mailer.setStyle(style);
 
 //Examples for every supported html part of mailer
 var emailParts = [

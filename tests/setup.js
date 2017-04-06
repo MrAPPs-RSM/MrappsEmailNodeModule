@@ -1,30 +1,14 @@
 var Mailer = require('./../mailer');
-
-module.exports.testConfig = function (test) {
-
-    var mailer = new Mailer();
-
-    var host = "ssl0.ovh.net";
-    var port = 587;
-    var user = "luca@mr-apps.com";
-    var password = "Mr?APP2015s!30";
-
-    mailer.setConfig(host, port, user, password);
-
-    var expected = {
-        host: host,
-        port: port,
-        user: user,
-        password: password
-    };
-
-    test.deepEqual(mailer.config, expected);
-    test.done();
+var config = {
+    host: "ssl0.ovh.net",
+    port: 587,
+    user: "luca@mr-apps.com",
+    password: "Mr?APP2015s!30"
 };
 
-module.exports.testStyle = function (test) {
+var mailer = new Mailer(config);
 
-    var mailer = new Mailer();
+module.exports.testStyle = function (test) {
 
     var style = {
         backgroundColor: "#9999CC",

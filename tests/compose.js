@@ -1,9 +1,15 @@
 var Mailer = require('./../mailer');
 var fs = require('fs');
+var config = {
+    host: "ssl0.ovh.net",
+    port: 587,
+    user: "luca@mr-apps.com",
+    password: "Mr?APP2015s!30"
+};
+
+var mailer = new Mailer(config);
 
 module.exports.testComposeFail = function (test) {
-
-    var mailer = new Mailer();
 
     mailer.composeMail([], "", null)
         .then(function () {
@@ -17,8 +23,6 @@ module.exports.testComposeFail = function (test) {
 };
 
 module.exports.testComposeOk = function (test) {
-
-    var mailer = new Mailer();
 
     var emailParts = [
         //Image
