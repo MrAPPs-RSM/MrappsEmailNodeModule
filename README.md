@@ -8,13 +8,14 @@ Email handler for node.js
 
 ## Installation:
 
-package.json
-```json
-{
-  "dependencies": {
-    "mrapps-mailer": "1.0.0"
-  }
-}
+```bash
+npm install --save git+https://git@github.com/MrAPPs-RSM/MrappsEmailNodeModule
+```
+
+or
+
+```bash
+npm install --save git+ssh://git@github.com/MrAPPs-RSM/MrappsEmailNodeModule
 ```
 
 
