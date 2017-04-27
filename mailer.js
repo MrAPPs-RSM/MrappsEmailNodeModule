@@ -86,56 +86,31 @@ var Mailer = function (config) {
          * @param subject email Subject
          * @param from email Sender
          * @param to receivers
-         * @param emailParts array that contains email structure to compose
-         * @param logoUrl url absolute url of email logo
-         * @param companyName
-         * @param street
-         * @param otherInfo
+         * @param html
          *
          * @return Promise
          *
          */
-        sendMail: function (subject, from, to, emailParts, logoUrl, companyName, street, otherInfo) {
+        sendMail: function (subject, from, to, html) {
 
             return new Promise(function (resolve, reject) {
 
-                if (from === undefined || from === null ||
-                    to === undefined || to === null ||
-                    emailParts === undefined || emailParts === null ||
-                    logoUrl === undefined || logoUrl === null ||
-                    companyName === undefined || companyName === null ||
-                    street === undefined || street === null
-                ) {
-                    reject("Some params cannot be empty");
-                }
-                else {
+                /** Setup email data */
+                var mailOptions = {
+                    from: from,
+                    to: to.join(','),
+                    subject: subject,
+                    html: html
+                };
 
-                    mailer.composeMail(emailParts, logoUrl, companyName, street, otherInfo)
-                        .then(function (body) {
-
-                            /** Setup email data */
-                            var mailOptions = {
-                                from: from,
-                                to: to.join(','),
-                                subject: subject,
-                                html: body
-                            };
-
-                            /** Send mail with defined transport object */
-                            mailer.transport.sendMail(mailOptions, function (error, info) {
-
-                                if (error) {
-                                    reject(error);
-                                } else {
-                                    resolve(info);
-                                }
-
-                            });
-                        })
-                        .catch(function (error) {
-                            reject(error);
-                        });
-                }
+                /** Send mail with defined transport object */
+                mailer.transport.sendMail(mailOptions, function (error, info) {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(info);
+                    }
+                });
             });
         }
     };

@@ -128,20 +128,28 @@ var emailParts = [
      }
 ];
 
-mailer.sendMail(
-    "Subject",
-     "email@sender.com",
-     ["first@receiver.com","second@receiver.com"],
-     emailParts,
-     "http://placehold.it/200x50",
-     "Test company",
-     "Some street, 14A"
+mailer.composeMail(
+    emailParts,
+    "http://placehold.it/200x50", //Logo url
+    "Test company", //Company name
+    "Some street, 14A" //Street name
 )
-    .then(function (info) {
-        console.log('Message %s sent: %s', info.messageId, info.response);
+    .then(function (html) {
+        mailer.sendMail(
+            "Subject", //Email subject
+            "email@sender.com", //Email sender
+            ["first@receiver.com","second@receiver.com"], //Email receivers
+            html //Email body
+        )
+            .then(function (info) {
+                console.log('Message %s sent: %s', info.messageId, info.response);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
     })
     .catch(function (error) {
-        console.log(error);
+        console.log("Render error:" + error);
     });
 ```
 
