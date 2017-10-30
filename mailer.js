@@ -52,7 +52,7 @@ var Mailer = function (config) {
                     reject("Some params cannot be empty");
                 } else {
 
-                    twig.renderFile('./views/index.html.twig',
+                    twig.renderFile(require('path').resolve(__dirname, './views/index.html.twig'),
                         {
                             //Email style
                             backgroundColor: mailer.style.backgroundColor,
