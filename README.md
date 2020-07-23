@@ -34,7 +34,7 @@ First, create a configuration file with the following parameters
 And then pass the config object to the constructor
 
 ```javascript
-import {Mailer} from 'mrapps-mailer';
+import {Mailer, EmailPart, EmailPartType} from 'mrapps-mailer';
 const mailer = new Mailer(config);
 ```
 
@@ -42,10 +42,10 @@ const mailer = new Mailer(config);
 
 ```javascript
 const mailer = new Mailer({
-  "host": "host_name",
-  "port": "host_port",
-  "user": "user_email",
-  "password": "user_password"
+  host: "host_name",
+  port: "host_port",
+  user: "user_email",
+  password: "user_password"
 });
 
 //Optional (to override template colors)
@@ -133,8 +133,8 @@ const emailParts: Array<EmailPart> = [
      }
 ];
 const company: CompanyInfo = {
-    companyName: 'test',
-    street: 'Via di qua',
+    companyName: 'Test Company',
+    street: 'Via di qua, 12',
     logoUrl: 'http://placeholder.it/200x50'
 }
 
