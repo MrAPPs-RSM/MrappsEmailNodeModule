@@ -2,9 +2,11 @@
   "name": "mrapps-mailer",
   "version": "1.0.0",
   "description": "Node module for email",
-  "main": "mailer.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "nodeunit ./tests/"
+    "build": "tsc",
+    "test": "mocha --reporter spec --require ts-node/register tests/**/*.test.ts"
   },
   "repository": {
     "type": "git",
@@ -21,7 +23,18 @@
   },
   "homepage": "https://github.com/MrAPPs-RSM/MrappsEmailNodeModule#readme",
   "dependencies": {
-    "nodemailer": "^3.1.8",
-    "twig": "^1.10.4"
+    "nodemailer": "^6.4.10",
+    "twig": "^1.12.3"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.2.11",
+    "@types/mocha": "^8.0.0",
+    "@types/nodemailer": "^6.4.0",
+    "@types/twig": "^1.12.3",
+    "chai": "^4.2.0",
+    "mocha": "^8.0.1",
+    "nyc": "^15.1.0",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
   }
 }

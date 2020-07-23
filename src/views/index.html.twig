@@ -114,8 +114,8 @@
 
         .button-td:hover,
         .button-a:hover {
-            background: {{ mainColorHover }} !important;
-            border-color: {{ mainColorHover }} !important;
+            background: {{ settings.mainColorHover }} !important;
+            border-color: {{ settings.mainColorHover }} !important;
         }
 
         /* Media Queries */
@@ -195,8 +195,8 @@
         }
     </style>
 </head>
-<body bgcolor="{{ backgroundColor }}" width="100%" style="margin: 0;">
-<table bgcolor="{{ backgroundColor }}" cellpadding="0" cellspacing="0" border="0" height="100%" width="100%"
+<body bgcolor="{{ settings.backgroundColor }}" width="100%" style="margin: 0;">
+<table bgcolor="{{ settings.backgroundColor }}" cellpadding="0" cellspacing="0" border="0" height="100%" width="100%"
        style="border-collapse:collapse;">
     <tr>
         <td valign="top">
@@ -206,17 +206,17 @@
                     <!-- Logo -->
                     <tr>
                         <td style="padding: 20px 0; text-align: center">
-                            <img src="{{ logoUrl }}"
+                            <img src="{{ settings.logoUrl }}"
                                  style="max-width: 200px; max-height: 100px; height: auto; width: auto;"
-                                 alt="{{ companyName }}" border="0">
+                                 alt="{{ settings.companyName }}" border="0">
                         </td>
                     </tr>
                 </table>
                 <!-- Email Body -->
-                <table cellspacing="0" cellpadding="0" border="0" align="center" bgcolor="{{ contentColor }}"
+                <table cellspacing="0" cellpadding="0" border="0" align="center" bgcolor="{{ settings.contentColor }}"
                        width="600" class="email-container"
                        style="-moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);">
-                    {% for part in emailParts %}
+                    {% for part in settings.emailParts %}
                         {% if part.type=='image' %}
                             {% include './parts/image.html.twig' with {'imageUrl':part.imageUrl|default(null)} %}
                         {% elseif part.type=='one_col_text' %}
@@ -259,7 +259,7 @@
                         {% endif %}
                     {% endfor %}
                 </table>
-                {% include './footer.html.twig' with {'companyName':companyName,'street':street,'otherInfo':otherInfo|default(null)} %}
+                {% include './footer.html.twig' with {'companyName':settings.companyName,'street':settings.street,'otherInfo':settings.otherInfo|default(null)} %}
             </center>
         </td>
     </tr>
