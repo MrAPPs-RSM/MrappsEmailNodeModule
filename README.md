@@ -1,10 +1,10 @@
 # MrApps Email NodeModule
 
-Email handler for node.js
+Email handler for Typescript
 
 ## Requirements:
 
-- Node.js v6+
+- Typescript +3.9.7
 
 ## Installation:
 
@@ -34,14 +34,19 @@ First, create a configuration file with the following parameters
 And then pass the config object to the constructor
 
 ```javascript
-var Mailer = require('mrapps-mailer');
-var mailer = new Mailer(config);
+import {Mailer} from 'mrapps-mailer';
+const mailer = new Mailer(config);
 ```
 
 ## Example:
 
 ```javascript
-var mailer = new Mailer(config.mailer);
+const mailer = new Mailer({
+  "host": "host_name",
+  "port": "host_port",
+  "user": "user_email",
+  "password": "user_password"
+});
 
 //Optional (to override template colors)
 var style = {
@@ -57,17 +62,17 @@ var style = {
 mailer.setStyle(style);
 
 //Examples for every supported html part of mailer
-var emailParts = [
+const emailParts: Array<EmailPart> = [
     
     //Image
     {
-        type: mailer.emailParts.Image,
+        type: EmailPartType.Image,
         imageUrl: "http://placehold.it/600x300"
     },
 
     //One col text
     {
-        type: mailer.emailParts.OneColText,
+        type: EmailPartType.OneColText,
         title: "Welcome",
         description: "Maecenas sed ante pellentesque, posuere leo id, eleifend dolor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Praesent laoreet malesuada cursus. Maecenas scelerisque congue eros eu posuere. Praesent in felis ut velit pretium lobortis rhoncus ut&nbsp;erat.",
         link: "http://www.google.it",
@@ -76,14 +81,14 @@ var emailParts = [
 
     //Background Image with Text
     {
-        type: mailer.emailParts.BgImageWithText,
+        type: EmailPartType.BgImageWithText,
         backgroundUrl: "http://placehold.it/600x230/AE3742/C3505B",
         description: "Maecenas sed ante pellentesque, posuere leo id, eleifend dolor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Praesent laoreet malesuada cursus. Maecenas scelerisque congue eros eu posuere. Praesent in felis ut velit pretium lobortis rhoncus ut&nbsp;erat."
     },
 
     //Two even cols xs
     {
-        type: mailer.emailParts.TwoEvenColsXs,
+        type: EmailPartType.TwoEvenColsXs,
         title: "2 Columns title",
         xsInvariate: false,
         rows: [
@@ -97,7 +102,7 @@ var emailParts = [
 
     //Three even cols xs
     {
-        type: mailer.emailParts.ThreeEvenColsXs,
+        type: EmailPartType.ThreeEvenColsXs,
         title: "3 Columns title",
         rows: [
             {
@@ -110,7 +115,7 @@ var emailParts = [
 
     //Thumbnail text 1
     {
-        type: mailer.emailParts.ThumbnailText,
+        type: EmailPartType.ThumbnailText,
         imageUrl: "http://placehold.it/170",
         title: "Maecenas sed ante pellentesque, posuere leo id",
         description: "Maecenas sed ante pellentesque, posuere leo id, eleifend dolor. Praesent laoreet malesuada cursus. Maecenas scelerisque congue eros eu posuere. Praesent in felis ut velit pretium lobortis rhoncus ut&nbsp;erat."
@@ -118,7 +123,7 @@ var emailParts = [
 
     //Thumbnail text 2
     {
-        type: mailer.emailParts.ThumbnailText,
+        type: EmailPartType.ThumbnailText,
         direction: "left",
         link: "http://www.google.it",
         linkTitle: "Go to website",
@@ -127,37 +132,26 @@ var emailParts = [
         description: "Maecenas sed ante pellentesque, posuere leo id, eleifend dolor. Praesent laoreet malesuada cursus. Maecenas scelerisque congue eros eu posuere. Praesent in felis ut velit pretium lobortis rhoncus ut&nbsp;erat."
      }
 ];
+const company: CompanyInfo = {
+    companyName: 'test',
+    street: 'Via di qua',
+    logoUrl: 'http://placeholder.it/200x50'
+}
 
-mailer.composeMail(
-    emailParts,
-    "http://placehold.it/200x50", //Logo url
-    "Test company", //Company name
-    "Some street, 14A" //Street name
-)
-    .then(function (html) {
-        mailer.sendMail(
-            "Subject", //Email subject
-            "email@sender.com", //Email sender
-            ["first@receiver.com","second@receiver.com"], //Email receivers
-            html //Email body
-        )
-            .then(function (info) {
-                console.log('Message %s sent: %s', info.messageId, info.response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-    })
-    .catch(function (error) {
-        console.log("Render error:" + error);
-    });
+// Compose HTML template
+const html = await mailer.compose(emailParts, company);
+
+// Send email with generated template
+const result = await mailer.send('subject', 'from', ['to1', 'to2'], html);
+
 ```
 
 ## Test:
 
 ### Requirements:
 
-- [nodeunit](https://github.com/caolan/nodeunit)
+- Mocha
+- Chai
 
 ### Run tests:
 
