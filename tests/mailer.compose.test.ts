@@ -8,10 +8,10 @@ const expect = chai.expect;
 
 describe('compose-mail', async () => {
     const mailer = new Mailer({
-        host: 'ssl0.ovh.net',
+        host: '',
         port: 587,
-        user: 'lorenzo.zoli@mr-apps.com',
-        password: 'Mr?APP2020s!18'
+        user: '',
+        password: ''
     });
 
     // it('compose-fail', () => {

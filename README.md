@@ -143,7 +143,6 @@ const html = await mailer.compose(emailParts, company);
 
 // Send email with generated template
 const result = await mailer.send('subject', 'from', ['to1', 'to2'], html);
-
 ```
 
 ## Test:
