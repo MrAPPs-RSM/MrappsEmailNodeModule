@@ -1,6 +1,6 @@
 import * as nodemailer from 'nodemailer';
 import * as twig from 'twig';
-import * as path from 'path';
+import path from 'path';
 
 export type Configuration = {
     host: string;
