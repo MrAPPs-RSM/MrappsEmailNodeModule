@@ -9,7 +9,7 @@ const expect = chai.expect;
 describe('compose-mail', async () => {
     const mailer = new Mailer({
         host: '',
-        port: 587,
+        port: 0,
         user: '',
         password: ''
     });
@@ -21,12 +21,13 @@ describe('compose-mail', async () => {
 
     it('compose-success', async () => {
         mailer.setStyle({
-            backgroundColor: "#9999CC",
-            contentColor: "#CEE5E8",
+            backgroundColor: "#181818",
+            contentColor: "#FFFFFF",
             boldColor: "#000000",
-            textColor: "#F2473F",
-            mainColor: "#333333",
-            mainColorHover: "#FFA812",
+            textColor: "#000000",
+            mainColor: "#000000",
+            mainButtonColor: "#C9BE37",
+            mainColorHover: "#EDDD0A",
             textOnMainColor: "#FFFFFF"
         })
 
@@ -117,10 +118,11 @@ describe('compose-mail', async () => {
                 description: "Maecenas sed ante pellentesque, posuere leo id, eleifend dolor. Praesent laoreet malesuada cursus. Maecenas scelerisque congue eros eu posuere. Praesent in felis ut velit pretium lobortis rhoncus ut&nbsp;erat."
             }
         ];
+
         const company: CompanyInfo = {
-            companyName: 'test',
+            companyName: 'Test',
             street: 'Via di qua',
-            logoUrl: 'http://placeholder.it/200x50'
+            logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png"
         }
 
         const html = await mailer.compose(emailParts, company);
@@ -131,7 +133,7 @@ describe('compose-mail', async () => {
             }
         })
 
-        const result = await mailer.send('lorenzo.zoli@mr-apps.com', 'noreply@mr-apps.com', ['lorenzo.zoli@mr-apps.com'], html);
+        const result = await mailer.send('subject', 'from', ['to1', 'to2'], html);
         console.log(result);
     })
 })

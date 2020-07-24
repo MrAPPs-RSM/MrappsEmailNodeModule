@@ -15,6 +15,7 @@ export type Style = {
     boldColor: string;
     textColor: string;
     mainColor: string;
+    mainButtonColor: string;
     mainColorHover: string;
     textOnMainColor: string;
 }
@@ -69,11 +70,10 @@ export class Mailer {
         boldColor: "#000000",
         textColor: "#555555",
         mainColor: "#333333",
+        mainButtonColor: '#333333',
         mainColorHover: "#000000",
         textOnMainColor: "#FFFFFF"
     }
-
-    private html: any;
 
     constructor(config: Configuration) {
         // Inizialize SMTP transporter
@@ -99,7 +99,7 @@ export class Mailer {
 
     compose(emailParts: Array<EmailPart>, companyInfo: CompanyInfo): Promise<any> {
         return new Promise((resolve, reject) => {
-            twig.renderFile(path.resolve(__dirname, './views/index.html.twig'), {
+            twig.renderFile(path.resolve(__dirname, '../views/index.html.twig'), {
                 filename: 'index.html.twig',
                 settings: {
                     //Email style
@@ -108,6 +108,7 @@ export class Mailer {
                     boldColor: this.style.boldColor,
                     textColor: this.style.textColor,
                     mainColor: this.style.mainColor,
+                    mainButtonColor: this.style.mainButtonColor,
                     mainColorHover: this.style.mainColorHover,
                     textOnMainColor: this.style.textOnMainColor,
                     //Email data
