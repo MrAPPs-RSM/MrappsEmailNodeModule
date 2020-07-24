@@ -2,12 +2,12 @@
 <table align="center" width="600" class="email-container">
     <tr>
         <td style="padding: 40px 10px;width: 100%;font-size: 12px; font-family: sans-serif; mso-height-rule: exactly; line-height:18px; text-align: center;">
-            <span class="mobile-link--footer" style="color: #999999;">{{ companyName }}</span>
+            <span class="mobile-link--footer" style="color: #999999;">{{ settings.companyName }}</span>
             <br/>
-            <span class="mobile-link--footer" style="color: #999999;">{{ street }}</span>
+            <span class="mobile-link--footer" style="color: #999999;">{{ settings.street }}</span>
             {% if otherInfo is not empty %}
                 <br/>
-                <span class="mobile-link--footer" style="color: #999999;">{{ otherInfo }}</span>
+                <span class="mobile-link--footer" style="color: #999999;">{{ settings.otherInfo }}</span>
             {% endif %}
         </td>
     </tr>
