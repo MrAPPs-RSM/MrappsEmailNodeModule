@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "npx tsc",
     "postinstall": "npm run build",
     "test": "mocha --reporter spec --require ts-node/register tests/**/*.test.ts"
   },
@@ -26,16 +26,16 @@
   "dependencies": {
     "nodemailer": "^6.4.10",
     "twig": "^1.12.3",
-    "@types/chai": "^4.2.11",
-    "@types/mocha": "^8.0.0",
-    "@types/nodemailer": "^6.4.0",
-    "@types/twig": "^1.12.3",
     "chai": "^4.2.0",
     "mocha": "^8.0.1",
     "nyc": "^15.1.0",
+    "typescript": "^3.9.7",
     "ts-node": "^8.10.2"
   },
   "devDependencies": {
-    "typescript": "^3.9.7"
+    "@types/chai": "^4.2.11",
+    "@types/mocha": "^8.0.0",
+    "@types/nodemailer": "^6.4.0",
+    "@types/twig": "^1.12.3"
   }
 }
