@@ -26,7 +26,8 @@ export enum EmailPartType {
     ThreeEvenColsXs = "three_even_cols_xs",
     Image = "image",
     OneColText = "one_col_text",
-    ThumbnailText = "thumbnail_text"
+    ThumbnailText = "thumbnail_text",
+    Border = 'border'
 }
 
 export type EmailPartRow = {

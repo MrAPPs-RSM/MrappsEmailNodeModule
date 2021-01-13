@@ -223,6 +223,8 @@
                             {% include './parts/one_col_text.html.twig' with {'title':part.title|default(null),'description':part.description|default(''),'link':part.link|default(null),'linkTitle':part.linkTitle|default(null)} %}
                         {% elseif part.type=='bg_image_with_text' %}
                             {% include './parts/bg_image_with_text.html.twig' with {'backgroundUrl':part.backgroundUrl|default(null),'description':part.description|default('')} %}
+                        {% elseif part.type=='border' %}
+                            {% include './parts/border.html.twig' %}
                         {% elseif part.type=='two_even_cols_xs' %}
                             {% set partTitle = part.title|default(null) %}
                             {% for row in part.rows %}
