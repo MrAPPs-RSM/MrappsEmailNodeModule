@@ -27,6 +27,7 @@
     "@types/nodemailer": "^6.4.0",
     "@types/twig": "1.12.3",
     "chai": "^4.2.0",
+    "ics": "^2.27.0",
     "mocha": "^8.0.1",
     "nodemailer": "^6.4.10",
     "nyc": "^15.1.0",

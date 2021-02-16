@@ -1,6 +1,7 @@
 import * as nodemailer from 'nodemailer';
 import * as twig from 'twig';
 import path from 'path';
+import { EventAttributes, createEvent } from 'ics';
 
 export type Configuration = {
     host: string;
@@ -60,6 +61,10 @@ export interface EmailOption {
     from: string;
     to: Array<string>;
     html: any;
+}
+
+export interface EmailMetadata {
+    ical?: string;
 }
 
 export class Mailer {
@@ -129,12 +134,23 @@ export class Mailer {
         })
     }
 
-    async send(subject: string, from: string, to: Array<string>, html: any): Promise<nodemailer.SentMessageInfo> {
+    async generateCal(data: EventAttributes): Promise<string> {
+        return new Promise((resolve, reject) => {
+            createEvent(data, (error, value) => {
+                if (error) reject(error);
+
+                resolve(value);
+            })
+        });
+    }
+
+    async send(subject: string, from: string, to: Array<string>, html: any, metadata?: EmailMetadata): Promise<nodemailer.SentMessageInfo> {
         const options: nodemailer.SendMailOptions = {
-            subject: subject,
-            from: from,
             to: to.join(','),
-            html: html
+            icalEvent: metadata?.ical,
+            subject,
+            from,
+            html,
         }
 
         const info: nodemailer.SentMessageInfo = await this.transporter.sendMail(options);
