@@ -1,6 +1,6 @@
 {
   "name": "mrapps-mailer",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Node module for email",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
