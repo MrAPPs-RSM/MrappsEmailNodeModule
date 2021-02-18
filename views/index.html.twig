@@ -219,6 +219,8 @@
                     {% for part in settings.emailParts %}
                         {% if part.type=='image' %}
                             {% include './parts/image.html.twig' with {'imageUrl':part.imageUrl|default(null)} %}
+                        {% elseif part.type=='blocked_image' %}
+                            {% include './parts/blocked_image.html.twig' with {'imageUrl':part.imageUrl|default(null)} %}
                         {% elseif part.type=='one_col_text' %}
                             {% include './parts/one_col_text.html.twig' with {'title':part.title|default(null),'description':part.description|default(''),'link':part.link|default(null),'linkTitle':part.linkTitle|default(null)} %}
                         {% elseif part.type=='bg_image_with_text' %}

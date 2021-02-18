@@ -2,6 +2,7 @@ import * as nodemailer from 'nodemailer';
 import * as twig from 'twig';
 import path from 'path';
 import { EventAttributes, createEvent } from 'ics';
+import { InferencePriority } from 'typescript';
 
 export type Configuration = {
     host: string;
@@ -25,6 +26,7 @@ export enum EmailPartType {
     BgImageWithText = "bg_image_with_text",
     TwoEvenColsXs = "two_even_cols_xs",
     ThreeEvenColsXs = "three_even_cols_xs",
+    BlockedImage = 'blocked_image',
     Image = "image",
     OneColText = "one_col_text",
     ThumbnailText = "thumbnail_text",
@@ -67,6 +69,14 @@ export interface EmailMetadata {
     ical?: string;
 }
 
+export interface EmailMessage {
+    subject: string;
+    from: string;
+    to: Array<string>;
+    html: any;
+    metadata?: EmailMetadata
+}
+
 export class Mailer {
     public transporter: nodemailer.Transporter;
 
@@ -84,13 +94,14 @@ export class Mailer {
     constructor(config: Configuration) {
         // Inizialize SMTP transporter
         this.transporter = nodemailer.createTransport({
+            pool: true,
             host: config.host,
             port: config.port,
             auth: {
                 type: 'login',
                 user: config.user,
                 pass: config.password
-            }
+            },
         });
 
         // Twig extension
@@ -153,8 +164,14 @@ export class Mailer {
             html,
         }
 
-        const info: nodemailer.SentMessageInfo = await this.transporter.sendMail(options);
+        return await this.transporter.sendMail(options);
+    }
 
-        return info;
+    async sendMulti(messages: EmailMessage[]): Promise<void> {
+        // Send next when transporter is ready
+        while (this.transporter.isIdle() && messages.length > 0) {
+            await this.transporter.sendMail(messages[0]);
+            messages.shift();
+        }
     }
 }
