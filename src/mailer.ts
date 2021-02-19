@@ -2,7 +2,6 @@ import * as nodemailer from 'nodemailer';
 import * as twig from 'twig';
 import path from 'path';
 import { EventAttributes, createEvent } from 'ics';
-import { InferencePriority } from 'typescript';
 
 export type Configuration = {
     host: string;
@@ -78,7 +77,7 @@ export interface EmailMessage {
 }
 
 export class Mailer {
-    public transporter: nodemailer.Transporter;
+    public transporter?: nodemailer.Transporter;
 
     private style: Style = {
         backgroundColor: "#F5F5F5",
@@ -91,23 +90,29 @@ export class Mailer {
         textOnMainColor: "#FFFFFF"
     }
 
-    constructor(config: Configuration) {
-        // Inizialize SMTP transporter
-        this.transporter = nodemailer.createTransport({
-            pool: true,
-            host: config.host,
-            port: config.port,
-            auth: {
-                type: 'login',
-                user: config.user,
-                pass: config.password
-            },
-        });
+    constructor(config?: Configuration) {
+        if (config) {
+            // Inizialize SMTP transporter
+            this.transporter = nodemailer.createTransport({
+                pool: true,
+                host: config.host,
+                port: config.port,
+                auth: {
+                    type: 'login',
+                    user: config.user,
+                    pass: config.password
+                },
+            });
+        }
 
         // Twig extension
         twig.extendFilter('truncate', (string: string, length: number) => {
             return string.substring(0, length) + '...';
         })
+    }
+
+    public setTransporter(transporter: nodemailer.Transporter) {
+        this.transporter = transporter;
     }
 
     setStyle(style: Style): void {
@@ -156,9 +161,16 @@ export class Mailer {
     }
 
     async send(subject: string, from: string, to: Array<string>, html: any, metadata?: EmailMetadata): Promise<nodemailer.SentMessageInfo> {
+        if (!this.transporter) {
+            throw new Error('Transporter not initialized');
+        }
+        
         const options: nodemailer.SendMailOptions = {
             to: to.join(','),
-            icalEvent: metadata?.ical,
+            icalEvent: {
+                method: 'publish',
+                content: metadata?.ical
+            },
             subject,
             from,
             html,
@@ -168,6 +180,10 @@ export class Mailer {
     }
 
     async sendMulti(messages: EmailMessage[]): Promise<void> {
+        if (!this.transporter) {
+            throw new Error('Transporter not initialized');
+        }
+        
         // Send next when transporter is ready
         while (this.transporter.isIdle() && messages.length > 0) {
             await this.transporter.sendMail(messages[0]);
