@@ -1,7 +1,6 @@
 import * as nodemailer from 'nodemailer';
 import * as twig from 'twig';
 import path from 'path';
-import { EventAttributes, createEvent } from 'ics';
 
 export type Configuration = {
     host: string;
@@ -64,8 +63,25 @@ export interface EmailOption {
     html: any;
 }
 
+export interface EventAttribute {
+    start: string;
+    end: string;
+    uid: string;
+    created: string;
+    lastModified: string;
+    title: string;
+    description?: string;
+    organizer: {
+        name: string;
+        email: string;
+    };
+    partecipant: {
+        email: string;
+    }
+}
+
 export interface EmailMetadata {
-    ical?: string;
+    ical: string;
 }
 
 export interface EmailMessage {
@@ -150,12 +166,17 @@ export class Mailer {
         })
     }
 
-    async generateCal(data: EventAttributes): Promise<string> {
+    async generateCal(data: EventAttribute): Promise<string> {
         return new Promise((resolve, reject) => {
-            createEvent(data, (error, value) => {
-                if (error) reject(error);
+            twig.renderFile(path.resolve(__dirname, '../views/parts/ical_file.ics.twig'), {
+                filename: 'ical_file.ics.twig',
+                settings: data
+            }, (err: Error, html: any) => {
+                if (err) {
+                    reject(err);
+                }
 
-                resolve(value);
+                resolve(html);
             })
         });
     }
@@ -164,16 +185,23 @@ export class Mailer {
         if (!this.transporter) {
             throw new Error('Transporter not initialized');
         }
-        
-        const options: nodemailer.SendMailOptions = {
+
+        let options: nodemailer.SendMailOptions = {
             to: to.join(','),
-            icalEvent: {
-                method: 'publish',
-                content: metadata?.ical
-            },
             subject,
             from,
-            html,
+            html
+        }
+
+        if (metadata?.ical) {
+            options = {
+                ...options,
+                icalEvent: {
+                    method: 'request',
+                    filename: 'invitation.ics',
+                    content: metadata.ical
+                }
+            }
         }
 
         return await this.transporter.sendMail(options);

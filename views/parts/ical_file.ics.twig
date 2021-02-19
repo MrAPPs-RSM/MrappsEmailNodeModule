@@ -1,0 +1,22 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VEVENT
+DTSTART:{{ settings.start }}
+DTEND:{{ settings.end }}
+DTSTAMP:{{ settings.lastModified }}
+ORGANIZER;CN={{ settings.organizer.name }}:mailto:{{ settings.organizer.email }}
+UID:{{ settings.uid }}
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN={{ settings.partecipant.email }};X-NUM-GUESTS=0:mailto:{{ settings.partecipant.email }}
+X-MICROSOFT-CDO-OWNERAPPTID:307924667
+CREATED:{{ settings.lastModified }}
+DESCRIPTION:{{ settings.description }}
+LAST-MODIFIED:{{ settings.lastModified }}
+LOCATION:
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:{{ settings.title }}
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
