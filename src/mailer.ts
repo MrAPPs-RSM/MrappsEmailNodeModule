@@ -81,7 +81,8 @@ export interface EventAttribute {
 }
 
 export interface EmailMetadata {
-    ical: string;
+    ical?: string;
+    text?: string;
 }
 
 export interface EmailMessage {
@@ -190,7 +191,7 @@ export class Mailer {
             to: to.join(','),
             subject,
             from,
-            html
+            html,
         }
 
         if (metadata?.ical) {
@@ -201,6 +202,13 @@ export class Mailer {
                     filename: 'invitation.ics',
                     content: metadata.ical
                 }
+            }
+        }
+
+        if (metadata?.text) {
+            options = {
+                ...options,
+                text: metadata.text
             }
         }
 
