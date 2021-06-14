@@ -1,6 +1,7 @@
 import * as nodemailer from 'nodemailer';
 import * as twig from 'twig';
 import path from 'path';
+import { Readable } from 'stream';
 
 export type Configuration = {
     host: string;
@@ -80,9 +81,26 @@ export interface EventAttribute {
     }
 }
 
+interface AttachmentLike {
+    content?: string | Buffer | Readable;
+    path?: string;
+}
+
+interface EmailAttachment extends AttachmentLike {
+    filename?: string | false;
+    cid?: string;
+    encoding?: string;
+    contentType?: string;
+    contentTransferEncoding?: '7bit' | 'base64' | 'quoted-printable' | false;
+    contentDisposition?: 'attachment' | 'inline';
+    headers?: any;
+    raw?: string | Buffer | Readable | AttachmentLike;
+}
+
 export interface EmailMetadata {
     ical?: string;
     text?: string;
+    attachments?: EmailAttachment[];
 }
 
 export interface EmailMessage {
@@ -209,6 +227,13 @@ export class Mailer {
             options = {
                 ...options,
                 text: metadata.text
+            }
+        }
+
+        if (metadata?.attachments) {
+            options = {
+                ...options,
+                attachments: metadata.attachments
             }
         }
 
