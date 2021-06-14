@@ -86,7 +86,7 @@ interface AttachmentLike {
     path?: string;
 }
 
-interface EmailAttachment extends AttachmentLike {
+export interface EmailAttachment extends AttachmentLike {
     filename?: string | false;
     cid?: string;
     encoding?: string;

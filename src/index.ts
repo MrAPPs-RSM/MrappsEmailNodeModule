@@ -1,1 +1,1 @@
-export { Mailer, Style, Configuration, CompanyInfo, EmailPart, EmailPartType, EmailPartRow } from './mailer';
+export { Mailer, Style, Configuration, CompanyInfo, EmailPart, EmailPartType, EmailPartRow, EmailAttachment } from './mailer';
