@@ -24,17 +24,15 @@
   },
   "homepage": "https://github.com/MrAPPs-RSM/MrappsEmailNodeModule#readme",
   "dependencies": {
-    "@types/nodemailer": "^6.4.0",
-    "@types/twig": "1.12.3",
-    "chai": "^4.2.0",
-    "mocha": "^8.0.1",
     "nodemailer": "^6.4.10",
-    "nyc": "^15.1.0",
-    "ts-node": "^8.10.2",
     "twig": "1.15.1",
     "typescript": "^3.9.7"
   },
   "devDependencies": {
+    "@types/nodemailer": "^6.4.0",
+    "@types/twig": "1.12.3",
+    "chai": "^4.2.0",
+    "mocha": "^8.0.1",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^8.0.0"
   }
