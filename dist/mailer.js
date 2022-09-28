@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -14,7 +18,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -72,9 +76,10 @@ class Mailer {
             });
         }
         // Twig extension
-        twig.extendFilter('truncate', (string, length) => {
-            return string.substring(0, length) + '...';
-        });
+        // twig.extendFilter('truncate', (string: string, length: number[]) => {})
+        // twig.extendFilter('truncate', (string: string, length: number) => {
+        //     return string.substring(0, length) + '...';
+        // })
     }
     setTransporter(transporter) {
         this.transporter = transporter;
@@ -86,23 +91,23 @@ class Mailer {
         return new Promise((resolve, reject) => {
             twig.renderFile(path_1.default.resolve(__dirname, '../views/index.html.twig'), {
                 filename: 'index.html.twig',
-                settings: {
-                    //Email style
-                    backgroundColor: this.style.backgroundColor,
-                    contentColor: this.style.contentColor,
-                    boldColor: this.style.boldColor,
-                    textColor: this.style.textColor,
-                    mainColor: this.style.mainColor,
-                    mainButtonColor: this.style.mainButtonColor,
-                    mainColorHover: this.style.mainColorHover,
-                    textOnMainColor: this.style.textOnMainColor,
-                    //Email data
-                    logoUrl: companyInfo.logoUrl,
-                    companyName: companyInfo.companyName,
-                    street: companyInfo.street,
-                    otherInfo: companyInfo.otherInfo,
-                    emailParts: emailParts
-                }
+                // settings: {
+                //     //Email style
+                // }
+                backgroundColor: this.style.backgroundColor,
+                contentColor: this.style.contentColor,
+                boldColor: this.style.boldColor,
+                textColor: this.style.textColor,
+                mainColor: this.style.mainColor,
+                mainButtonColor: this.style.mainButtonColor,
+                mainColorHover: this.style.mainColorHover,
+                textOnMainColor: this.style.textOnMainColor,
+                //Email data
+                logoUrl: companyInfo.logoUrl,
+                companyName: companyInfo.companyName,
+                street: companyInfo.street,
+                otherInfo: companyInfo.otherInfo,
+                emailParts: emailParts
             }, (err, html) => {
                 if (err) {
                     reject(err);
@@ -114,10 +119,7 @@ class Mailer {
     generateCal(data) {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                twig.renderFile(path_1.default.resolve(__dirname, '../views/parts/ical_file.ics.twig'), {
-                    filename: 'ical_file.ics.twig',
-                    settings: data
-                }, (err, html) => {
+                twig.renderFile(path_1.default.resolve(__dirname, '../views/parts/ical_file.ics.twig'), Object.assign({ filename: 'ical_file.ics.twig' }, data), (err, html) => {
                     if (err) {
                         reject(err);
                     }

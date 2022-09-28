@@ -1,8 +1,8 @@
 <!-- 1 Column Text -->
 <tr>
-    <td style="padding: 40px; text-align: center; font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: {{ settings.textColor }};">
+    <td style="padding: 40px; text-align: center; font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: {{ textColor }};">
         {% if title is not empty %}<h1
-            style="text-transform: uppercase; font-size: 18px; color: {{ settings.mainColor }}; margin-top: 0px;">
+            style="text-transform: uppercase; font-size: 18px; color: {{ mainColor }}; margin-top: 0px;">
             {{ title }}</h1>{% endif %}
         {{ description | raw }}
         {% if link is not empty %}
@@ -10,10 +10,10 @@
             <br/><br/>
             <table cellspacing="0" cellpadding="0" border="0" align="center" style="margin: auto">
                 <tr>
-                    <td style="border-radius: 5px; background: {{ settings.mainButtonColor }}; text-align: center;"
+                    <td style="border-radius: 5px; background: {{ mainButtonColor }}; text-align: center;"
                         class="button-td">
                         <a href="{{ link }}"
-                           style="background: {{ settings.mainButtonColor }}; border: 15px solid {{ settings.mainButtonColor }}; padding: 0 10px;color: {{ settings.textOnMainColor }}; font-family: sans-serif; font-size: 13px; line-height: 1.1; text-align: center; text-decoration: none; display: block; border-radius: 5px; font-weight: bold;"
+                           style="background: {{ mainButtonColor }}; border: 15px solid {{ mainButtonColor }}; padding: 0 10px;color: {{ textOnMainColor }}; font-family: sans-serif; font-size: 13px; line-height: 1.1; text-align: center; text-decoration: none; display: block; border-radius: 5px; font-weight: bold;"
                            class="button-a">
                             <!--[if mso]>&nbsp;&nbsp;&nbsp;&nbsp;<![endif]-->
                             {% if linkTitle is not empty %}

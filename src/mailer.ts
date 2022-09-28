@@ -139,11 +139,6 @@ export class Mailer {
                 },
             });
         }
-
-        // Twig extension
-        twig.extendFilter('truncate', (string: string, length: number) => {
-            return string.substring(0, length) + '...';
-        })
     }
 
     public setTransporter(transporter: nodemailer.Transporter) {
@@ -158,23 +153,20 @@ export class Mailer {
         return new Promise((resolve, reject) => {
             twig.renderFile(path.resolve(__dirname, '../views/index.html.twig'), {
                 filename: 'index.html.twig',
-                settings: {
-                    //Email style
-                    backgroundColor: this.style.backgroundColor,
-                    contentColor: this.style.contentColor,
-                    boldColor: this.style.boldColor,
-                    textColor: this.style.textColor,
-                    mainColor: this.style.mainColor,
-                    mainButtonColor: this.style.mainButtonColor,
-                    mainColorHover: this.style.mainColorHover,
-                    textOnMainColor: this.style.textOnMainColor,
-                    //Email data
-                    logoUrl: companyInfo.logoUrl,
-                    companyName: companyInfo.companyName,
-                    street: companyInfo.street,
-                    otherInfo: companyInfo.otherInfo,
-                    emailParts: emailParts
-                }
+                backgroundColor: this.style.backgroundColor,
+                contentColor: this.style.contentColor,
+                boldColor: this.style.boldColor,
+                textColor: this.style.textColor,
+                mainColor: this.style.mainColor,
+                mainButtonColor: this.style.mainButtonColor,
+                mainColorHover: this.style.mainColorHover,
+                textOnMainColor: this.style.textOnMainColor,
+                //Email data
+                logoUrl: companyInfo.logoUrl,
+                companyName: companyInfo.companyName,
+                street: companyInfo.street,
+                otherInfo: companyInfo.otherInfo,
+                emailParts: emailParts
             }, (err: Error, html: any) => {
                 if (err) {
                     reject(err);
@@ -189,7 +181,7 @@ export class Mailer {
         return new Promise((resolve, reject) => {
             twig.renderFile(path.resolve(__dirname, '../views/parts/ical_file.ics.twig'), {
                 filename: 'ical_file.ics.twig',
-                settings: data
+                ...data
             }, (err: Error, html: any) => {
                 if (err) {
                     reject(err);
