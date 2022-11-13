@@ -30,7 +30,7 @@
     "@types/nodemailer": "^6.4.0",
     "@types/twig": "1.12.3",
     "chai": "^4.2.0",
-    "mocha": "^8.0.1",
+    "mocha": "^10.1.0",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^8.0.0"
   }
