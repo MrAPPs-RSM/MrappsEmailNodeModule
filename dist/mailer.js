@@ -188,6 +188,7 @@ class Mailer {
             }
             if ((metadata === null || metadata === void 0 ? void 0 : metadata.resolveHostname) != null && this.config) {
                 const host = yield this.mxResolver.resolve(metadata.resolveHostname);
+                console.log(host);
                 this.applyConfig(Object.assign(Object.assign({}, this.config), { host, port: SMTP_DEFAULT_PORT }));
             }
             return yield this.transporter.sendMail(options);
