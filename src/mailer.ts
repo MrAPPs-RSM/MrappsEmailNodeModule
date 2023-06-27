@@ -2,8 +2,7 @@ import * as nodemailer from 'nodemailer';
 import * as twig from 'twig';
 import path from 'path';
 import { Readable } from 'stream';
-import MxResolver from 'mx-resolver';
-import SMTPPool from 'nodemailer/lib/smtp-pool';
+import dns from 'dns';
 const SMTP_DEFAULT_PORT = 25;
 
 export type Configuration = {
@@ -113,6 +112,37 @@ export interface EmailMessage {
     to: Array<string>;
     html: any;
     metadata?: EmailMetadata;
+}
+
+class MxResolver {
+    async resolve(hostname: string): Promise<string> {
+        const mx = await this.resolveMxAsync(hostname);
+        return await this.lookup(mx);
+    }
+
+    private async resolveMxAsync(hostname: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            try {
+                dns.resolveMx(hostname, (resolveErr, addresses: dns.MxRecord[]) => {
+                    return resolveErr ? reject(resolveErr) : resolve(addresses[0].exchange);
+                });
+            } catch (err) {
+                return reject(err);
+            }
+        });
+    }
+
+    private async lookup(hostname: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            try {
+                dns.lookup(hostname, (resolveErr, address: string) => {
+                    return resolveErr ? reject(resolveErr) : resolve(address);
+                });
+            } catch (err) {
+                return reject(err);
+            }
+        });
+    }
 }
 
 export class Mailer {

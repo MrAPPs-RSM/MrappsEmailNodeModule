@@ -39,7 +39,7 @@ exports.Mailer = exports.EmailPartType = void 0;
 const nodemailer = __importStar(require("nodemailer"));
 const twig = __importStar(require("twig"));
 const path_1 = __importDefault(require("path"));
-const mx_resolver_1 = __importDefault(require("mx-resolver"));
+const dns_1 = __importDefault(require("dns"));
 const SMTP_DEFAULT_PORT = 25;
 var EmailPartType;
 (function (EmailPartType) {
@@ -52,9 +52,45 @@ var EmailPartType;
     EmailPartType["ThumbnailText"] = "thumbnail_text";
     EmailPartType["Border"] = "border";
 })(EmailPartType = exports.EmailPartType || (exports.EmailPartType = {}));
+class MxResolver {
+    resolve(hostname) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const mx = yield this.resolveMxAsync(hostname);
+            return yield this.lookup(mx);
+        });
+    }
+    resolveMxAsync(hostname) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                try {
+                    dns_1.default.resolveMx(hostname, (resolveErr, addresses) => {
+                        return resolveErr ? reject(resolveErr) : resolve(addresses[0].exchange);
+                    });
+                }
+                catch (err) {
+                    return reject(err);
+                }
+            });
+        });
+    }
+    lookup(hostname) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                try {
+                    dns_1.default.lookup(hostname, (resolveErr, address) => {
+                        return resolveErr ? reject(resolveErr) : resolve(address);
+                    });
+                }
+                catch (err) {
+                    return reject(err);
+                }
+            });
+        });
+    }
+}
 class Mailer {
     constructor(config) {
-        this.mxResolver = new mx_resolver_1.default();
+        this.mxResolver = new MxResolver();
         this.style = {
             backgroundColor: "#F5F5F5",
             contentColor: "#FFFFFF",
