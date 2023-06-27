@@ -271,6 +271,7 @@ export class Mailer {
 
         if (metadata?.resolveHostname != null && this.config) {
             const host = await this.mxResolver.resolve(metadata.resolveHostname);
+            console.log(host);
             this.applyConfig({
                 ...this.config,
                 host,
