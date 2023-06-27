@@ -39,6 +39,8 @@ exports.Mailer = exports.EmailPartType = void 0;
 const nodemailer = __importStar(require("nodemailer"));
 const twig = __importStar(require("twig"));
 const path_1 = __importDefault(require("path"));
+const mx_resolver_1 = __importDefault(require("mx-resolver"));
+const SMTP_DEFAULT_PORT = 25;
 var EmailPartType;
 (function (EmailPartType) {
     EmailPartType["BgImageWithText"] = "bg_image_with_text";
@@ -52,6 +54,7 @@ var EmailPartType;
 })(EmailPartType = exports.EmailPartType || (exports.EmailPartType = {}));
 class Mailer {
     constructor(config) {
+        this.mxResolver = new mx_resolver_1.default();
         this.style = {
             backgroundColor: "#F5F5F5",
             contentColor: "#FFFFFF",
@@ -64,25 +67,23 @@ class Mailer {
         };
         if (config) {
             // Inizialize SMTP transporter
-            this.transporter = nodemailer.createTransport({
-                pool: true,
-                host: config.host,
-                port: config.port,
-                auth: {
-                    type: 'login',
-                    user: config.user,
-                    pass: config.password
-                },
-            });
+            this.applyConfig(config);
         }
-        // Twig extension
-        // twig.extendFilter('truncate', (string: string, length: number[]) => {})
-        // twig.extendFilter('truncate', (string: string, length: number) => {
-        //     return string.substring(0, length) + '...';
-        // })
     }
     setTransporter(transporter) {
         this.transporter = transporter;
+    }
+    applyConfig(config) {
+        this.transporter = nodemailer.createTransport({
+            pool: true,
+            host: config.host,
+            port: config.port,
+            auth: {
+                type: 'login',
+                user: config.user,
+                pass: config.password
+            },
+        });
     }
     setStyle(style) {
         this.style = style;
@@ -91,9 +92,6 @@ class Mailer {
         return new Promise((resolve, reject) => {
             twig.renderFile(path_1.default.resolve(__dirname, '../views/index.html.twig'), {
                 filename: 'index.html.twig',
-                // settings: {
-                //     //Email style
-                // }
                 backgroundColor: this.style.backgroundColor,
                 contentColor: this.style.contentColor,
                 boldColor: this.style.boldColor,
@@ -151,6 +149,10 @@ class Mailer {
             }
             if (metadata === null || metadata === void 0 ? void 0 : metadata.attachments) {
                 options = Object.assign(Object.assign({}, options), { attachments: metadata.attachments });
+            }
+            if ((metadata === null || metadata === void 0 ? void 0 : metadata.resolveHostname) != null && this.config) {
+                const host = yield this.mxResolver.resolve(metadata.resolveHostname);
+                this.applyConfig(Object.assign(Object.assign({}, this.config), { host, port: SMTP_DEFAULT_PORT }));
             }
             return yield this.transporter.sendMail(options);
         });

@@ -90,6 +90,7 @@ export interface EmailMetadata {
     ical?: string;
     text?: string;
     attachments?: EmailAttachment[];
+    resolveHostname?: string;
 }
 export interface EmailMessage {
     subject: string;
@@ -100,9 +101,12 @@ export interface EmailMessage {
 }
 export declare class Mailer {
     transporter?: nodemailer.Transporter;
+    private mxResolver;
+    private config?;
     private style;
     constructor(config?: Configuration);
     setTransporter(transporter: nodemailer.Transporter): void;
+    private applyConfig;
     setStyle(style: Style): void;
     compose(emailParts: Array<EmailPart>, companyInfo: CompanyInfo): Promise<any>;
     generateCal(data: EventAttribute): Promise<string>;

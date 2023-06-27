@@ -2,6 +2,9 @@ import * as nodemailer from 'nodemailer';
 import * as twig from 'twig';
 import path from 'path';
 import { Readable } from 'stream';
+import MxResolver from 'mx-resolver';
+import SMTPPool from 'nodemailer/lib/smtp-pool';
+const SMTP_DEFAULT_PORT = 25;
 
 export type Configuration = {
     host: string;
@@ -101,6 +104,7 @@ export interface EmailMetadata {
     ical?: string;
     text?: string;
     attachments?: EmailAttachment[];
+    resolveHostname?: string;
 }
 
 export interface EmailMessage {
@@ -108,11 +112,13 @@ export interface EmailMessage {
     from: string;
     to: Array<string>;
     html: any;
-    metadata?: EmailMetadata
+    metadata?: EmailMetadata;
 }
 
 export class Mailer {
     public transporter?: nodemailer.Transporter;
+    private mxResolver = new MxResolver();
+    private config?: Configuration;
 
     private style: Style = {
         backgroundColor: "#F5F5F5",
@@ -128,21 +134,25 @@ export class Mailer {
     constructor(config?: Configuration) {
         if (config) {
             // Inizialize SMTP transporter
-            this.transporter = nodemailer.createTransport({
-                pool: true,
-                host: config.host,
-                port: config.port,
-                auth: {
-                    type: 'login',
-                    user: config.user,
-                    pass: config.password
-                },
-            });
+            this.applyConfig(config);
         }
     }
 
     public setTransporter(transporter: nodemailer.Transporter) {
         this.transporter = transporter;
+    }
+
+    private applyConfig(config: Configuration) {
+        this.transporter = nodemailer.createTransport({
+            pool: true,
+            host: config.host,
+            port: config.port,
+            auth: {
+                type: 'login',
+                user: config.user,
+                pass: config.password
+            },
+        });
     }
 
     setStyle(style: Style): void {
@@ -229,6 +239,15 @@ export class Mailer {
             }
         }
 
+        if (metadata?.resolveHostname != null && this.config) {
+            const host = await this.mxResolver.resolve(metadata.resolveHostname);
+            this.applyConfig({
+                ...this.config,
+                host,
+                port: SMTP_DEFAULT_PORT
+            });
+        }
+
         return await this.transporter.sendMail(options);
     }
 
@@ -236,7 +255,7 @@ export class Mailer {
         if (!this.transporter) {
             throw new Error('Transporter not initialized');
         }
-        
+
         // Send next when transporter is ready
         while (this.transporter.isIdle() && messages.length > 0) {
             await this.transporter.sendMail(messages[0]);
