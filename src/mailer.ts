@@ -8,14 +8,14 @@ export enum TransportType {
   SMTP = "SMTP",
   AMAZON_SES = "AMAZON_SES",
 }
-export type Configuration = {
+export class Configuration {
   host?: string;
   port?: number;
   user?: string;
   password?: string;
   aws_access_key_id?: string;
   aws_secret_access_key?: string;
-  aws_region?: string = "eu-west-1"
+  aws_region?: string = "eu-west-1";
   transport?: TransportType = TransportType.SMTP;
 }
 
@@ -138,37 +138,46 @@ export class Mailer {
     if (config) {
       if (config.transport === TransportType.SMTP) {
         this.transporter = nodemailer.createTransport({
-            pool: true,
-            host: config.host,
-            port: config.port,
-            auth: {
+          pool: true,
+          host: config.host,
+          port: config.port,
+          auth: {
             type: "login",
-            user: config.user,
-            pass: config.password,
-            },
+            user: config.user ?? "",
+            pass: config.password ?? "",
+          },
         });
-    } else if (config.transport === TransportType.AMAZON_SES) {
-       const ses = new aws.SES({
-        region: config.aws_region,
-        credentials: {
-            accessKeyId: config.aws_access_key_id ?? process.env.AWS_ACCESS_KEY_ID ?? "",
-            secretAccessKey: config.aws_secret_access_key ?? process.env.AWS_SECRET_ACCESS_KEY ?? "",
-        }
+      } else if (config.transport === TransportType.AMAZON_SES) {
+        const ses = new aws.SES({
+          region: config.aws_region,
+          credentials: {
+            accessKeyId:
+              config.aws_access_key_id ?? process.env.AWS_ACCESS_KEY_ID ?? "",
+            secretAccessKey:
+              config.aws_secret_access_key ??
+              process.env.AWS_SECRET_ACCESS_KEY ??
+              "",
+          },
         });
 
         // create Nodemailer SES transporter
         this.transporter = nodemailer.createTransport({
-        SES: { ses, aws },
+          SES: { ses, aws },
         });
-    }
+      }
 
-    // Twig extension
-    twig.extendFilter("truncate", (string: string, length: number) => {
-      return string.substring(0, length) + "...";
-    });
+      // Twig extension
+      twig.extendFilter("truncate", (string: string, params: false | any[]) => {
+        const length =
+          Array.isArray(params) && params.length > 0 ? params[0] : 10; // Default length if not provided
+        return string.length > length
+          ? string.substring(0, length) + "..."
+          : string;
+      });
+    }
   }
 
-  public setTransporter(transporter: nodemailer.Transporter) {
+  setTransporter(transporter: nodemailer.Transporter) {
     this.transporter = transporter;
   }
 
@@ -185,23 +194,21 @@ export class Mailer {
         path.resolve(__dirname, "../views/index.html.twig"),
         {
           filename: "index.html.twig",
-          settings: {
-            //Email style
-            backgroundColor: this.style.backgroundColor,
-            contentColor: this.style.contentColor,
-            boldColor: this.style.boldColor,
-            textColor: this.style.textColor,
-            mainColor: this.style.mainColor,
-            mainButtonColor: this.style.mainButtonColor,
-            mainColorHover: this.style.mainColorHover,
-            textOnMainColor: this.style.textOnMainColor,
-            //Email data
-            logoUrl: companyInfo.logoUrl,
-            companyName: companyInfo.companyName,
-            street: companyInfo.street,
-            otherInfo: companyInfo.otherInfo,
-            emailParts: emailParts,
-          },
+          //Email style
+          backgroundColor: this.style.backgroundColor,
+          contentColor: this.style.contentColor,
+          boldColor: this.style.boldColor,
+          textColor: this.style.textColor,
+          mainColor: this.style.mainColor,
+          mainButtonColor: this.style.mainButtonColor,
+          mainColorHover: this.style.mainColorHover,
+          textOnMainColor: this.style.textOnMainColor,
+          //Email data
+          logoUrl: companyInfo.logoUrl,
+          companyName: companyInfo.companyName,
+          street: companyInfo.street,
+          otherInfo: companyInfo.otherInfo,
+          emailParts: emailParts,
         },
         (err: Error, html: any) => {
           if (err) {
@@ -220,13 +227,12 @@ export class Mailer {
         path.resolve(__dirname, "../views/parts/ical_file.ics.twig"),
         {
           filename: "ical_file.ics.twig",
-          settings: data,
+          data,
         },
         (err: Error, html: any) => {
           if (err) {
             reject(err);
           }
-
           resolve(html);
         }
       );
