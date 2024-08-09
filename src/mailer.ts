@@ -151,8 +151,8 @@ export class Mailer {
        const ses = new aws.SES({
         region: config.aws_region,
         credentials: {
-            accessKeyId: String(config.aws_access_key_id?.toString()) || String(process.env.AWS_ACCESS_KEY_ID),
-            secretAccessKey: String(config.aws_secret_access_key) || String(process.env.AWS_SECRET_ACCESS_KEY),
+            accessKeyId: config.aws_access_key_id ?? process.env.AWS_ACCESS_KEY_ID ?? "",
+            secretAccessKey: config.aws_secret_access_key ?? process.env.AWS_SECRET_ACCESS_KEY ?? "",
         }
         });
 
