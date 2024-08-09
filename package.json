@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/MrAPPs-RSM/MrappsEmailNodeModule#readme",
   "dependencies": {
+    "@aws-sdk/client-ses": "^3.624.0",
     "nodemailer": "6.9.14",
     "twig": "1.17.1",
     "typescript": "5.5.3"
