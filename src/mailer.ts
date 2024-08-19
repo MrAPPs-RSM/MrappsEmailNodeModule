@@ -283,7 +283,6 @@ export class Mailer {
         attachments: metadata.attachments,
       };
     }
-
     return await this.transporter.sendMail(options);
   }
 
