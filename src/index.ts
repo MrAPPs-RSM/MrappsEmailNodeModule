@@ -8,4 +8,5 @@ export {
   EmailPartType,
   EmailPartRow,
   EmailAttachment,
+  EmailMetadata,
 } from "./mailer";
