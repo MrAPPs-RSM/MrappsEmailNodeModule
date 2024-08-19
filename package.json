@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "prepare": "npm run build",
     "test": "mocha --reporter spec --require ts-node/register tests/**/*.test.ts"
   },
   "repository": {
