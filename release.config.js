@@ -20,5 +20,9 @@ module.exports = {
       path: '@semantic-release/exec',
       publishCmd: publishCommands
     },
+    {
+      path: '@semantic-release/npm',
+      npmPublish: true
+    }
   ],
 };
