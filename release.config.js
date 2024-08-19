@@ -22,7 +22,8 @@ module.exports = {
     },
     {
       path: '@semantic-release/npm',
-      npmPublish: true
+      npmPublish: true,
+      pkgRoot: "dist"
     }
   ],
 };
