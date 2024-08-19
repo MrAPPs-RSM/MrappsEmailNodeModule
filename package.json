@@ -9,9 +9,17 @@
   },
   "scripts": {
     "build": "tsc",
-    "prepare": "npm run build",
+    "prepublish": "npm run build",
     "test": "mocha --reporter spec --require ts-node/register tests/**/*.test.ts"
   },
+  "files": [
+    "dist",
+    "views",
+    "README.md"
+  ],
+  "publishConfig": {
+  "registry": "https://npm.pkg.github.com"
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MrAPPs-RSM/MrappsEmailNodeModule.git"
