@@ -194,21 +194,23 @@ export class Mailer {
         path.resolve(__dirname, "../views/index.html.twig"),
         {
           filename: "index.html.twig",
-          //Email style
-          backgroundColor: this.style.backgroundColor,
-          contentColor: this.style.contentColor,
-          boldColor: this.style.boldColor,
-          textColor: this.style.textColor,
-          mainColor: this.style.mainColor,
-          mainButtonColor: this.style.mainButtonColor,
-          mainColorHover: this.style.mainColorHover,
-          textOnMainColor: this.style.textOnMainColor,
-          //Email data
-          logoUrl: companyInfo.logoUrl,
-          companyName: companyInfo.companyName,
-          street: companyInfo.street,
-          otherInfo: companyInfo.otherInfo,
-          emailParts: emailParts,
+          settings: Object.assign({
+            //Email style
+            backgroundColor: this.style.backgroundColor,
+            contentColor: this.style.contentColor,
+            boldColor: this.style.boldColor,
+            textColor: this.style.textColor,
+            mainColor: this.style.mainColor,
+            mainButtonColor: this.style.mainButtonColor,
+            mainColorHover: this.style.mainColorHover,
+            textOnMainColor: this.style.textOnMainColor,
+            //Email data
+            logoUrl: companyInfo.logoUrl,
+            companyName: companyInfo.companyName,
+            street: companyInfo.street,
+            otherInfo: companyInfo.otherInfo,
+            emailParts: emailParts,
+          }),
         },
         (err: Error, html: any) => {
           if (err) {
