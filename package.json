@@ -1,5 +1,5 @@
 {
-  "name": "mrapps-mailer",
+  "name": "@mrapps-rsm/mrappsemailnodemodule",
   "version": "3.1.0",
   "description": "Node module for email",
   "main": "dist/index.js",
