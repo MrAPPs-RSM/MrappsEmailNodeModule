@@ -1,3 +1,15 @@
+# [3.3.0](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.2.0...3.3.0) (2024-08-20)
+
+
+### Bug Fixes
+
+* add package root ([9730fba](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/9730fbadf9b955ea3b7cfb012148b9c560b803d9))
+
+
+### Features
+
+* change package name ([a74a65a](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/a74a65a2d76ea14af3c40ec7e14bc7ae026e1383))
+
 # [3.2.0](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.1.0...3.2.0) (2024-08-19)
 
 
