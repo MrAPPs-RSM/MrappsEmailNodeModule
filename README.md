@@ -9,27 +9,33 @@ Email handler for Typescript
 ## Installation:
 
 ```bash
-npm install --save git+https://git@github.com/MrAPPs-RSM/MrappsEmailNodeModule
+npm install @mrapps-rsm/mrappsemailnodemodule
 ```
-
-or
-
-```bash
-npm install --save git+ssh://git@github.com/MrAPPs-RSM/MrappsEmailNodeModule
-```
-
 
 ## Usage:
 
-First, create a configuration file with the following parameters
-```json
-{
-  "host": "host_name",
-  "port": "host_port",
-  "user": "user_email",
-  "password": "user_password"
-}
-```
+The Email Node Module supports both *Amazon SES* and *SMTP* .
+
+First, create a configuration file with the following parameters:
+- SMTP
+  ```json
+  {
+    "host": "host_name",
+    "port": "host_port",
+    "user": "user_email",
+    "password": "user_password",
+    "transport": "SMTP"
+  }
+  ```
+- AMAZON SES
+  ```json
+  {
+    "aws_access_key_id": "",
+    "aws_secret_access_key": "",
+    "aws_region": "eu-west-1",
+    "transport": "AMAZON_SES"
+  }
+  ```
 
 And then pass the config object to the constructor
 
@@ -41,12 +47,24 @@ const mailer = new Mailer(config);
 ## Example:
 
 ```javascript
+
 const mailer = new Mailer({
   host: "host_name",
   port: "host_port",
   user: "user_email",
-  password: "user_password"
+  password: "user_password",
+  transport: TransportType.SMTP
 });
+
+// or with AMAZON_SES
+/*
+const mailer = new Mailer({
+  aws_access_key_id: "1234",
+  aws_secret_access_key: "5678",
+  aws_region: "eu-west-1",
+  transport: TransportType.AMAZON_SES
+});
+*/
 
 //Optional (to override template colors)
 var style = {
