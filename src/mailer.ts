@@ -13,6 +13,7 @@ export class Configuration {
   port?: number;
   user?: string;
   password?: string;
+  aws_source_address?: string;
   aws_access_key_id?: string;
   aws_secret_access_key?: string;
   aws_region?: string = "eu-west-1";
@@ -122,6 +123,7 @@ export interface EmailMessage {
 
 export class Mailer {
   public transporter?: nodemailer.Transporter;
+  private sourceAddress: string = "";
 
   private style: Style = {
     backgroundColor: "#F5F5F5",
@@ -137,6 +139,7 @@ export class Mailer {
   constructor(config?: Configuration) {
     if (config) {
       if (config.transport === TransportType.SMTP) {
+        this.sourceAddress = config.user ?? "";
         this.transporter = nodemailer.createTransport({
           pool: true,
           host: config.host,
@@ -148,6 +151,7 @@ export class Mailer {
           },
         });
       } else if (config.transport === TransportType.AMAZON_SES) {
+        this.sourceAddress = config.aws_source_address ?? "";
         const ses = new aws.SES({
           region: config.aws_region,
           credentials: {
@@ -255,7 +259,8 @@ export class Mailer {
     let options: nodemailer.SendMailOptions = {
       to: to.join(","),
       subject,
-      from,
+      sender: this.sourceAddress,
+      from: from,
       html,
     };
 
