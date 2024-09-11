@@ -1,3 +1,10 @@
+## [3.4.1](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.4.0...3.4.1) (2024-09-11)
+
+
+### Bug Fixes
+
+* trigger release ([7aae07c](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/7aae07cf9824b39bd886d62912d990af324d6255))
+
 # [3.4.0](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.3.0...3.4.0) (2024-09-11)
 
 
