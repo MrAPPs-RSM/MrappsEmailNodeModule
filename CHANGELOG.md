@@ -1,3 +1,10 @@
+# [3.4.0](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.3.0...3.4.0) (2024-09-11)
+
+
+### Features
+
+* use different email address in ses ([6c2535e](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/6c2535eee53c1b9721597dab536cff1ff385d885))
+
 # [3.3.0](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.2.0...3.3.0) (2024-08-20)
 
 
