@@ -1,3 +1,12 @@
+## [3.4.6](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.4.5...3.4.6) (2026-01-22)
+
+
+### Bug Fixes
+
+* CI ([68a280a](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/68a280a271e388921bc4466c3ecc401ee956a021))
+* CI ([346f168](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/346f1685f81f875d3214cee9f89941cd45eb620a))
+* CI ([e2199f6](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/e2199f6ac352c1a34fd29592fbb170d492e66758))
+
 ## [3.4.1](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.4.0...3.4.1) (2024-09-11)
 
 
