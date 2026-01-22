@@ -2,7 +2,7 @@ import * as nodemailer from "nodemailer";
 import * as twig from "twig";
 import path from "path";
 import { Readable } from "stream";
-import * as aws from "@aws-sdk/client-ses";
+import { SESv2Client,SendEmailCommand } from "@aws-sdk/client-sesv2";
 
 export enum TransportType {
   SMTP = "SMTP",
@@ -152,7 +152,7 @@ export class Mailer {
         });
       } else if (config.transport === TransportType.AMAZON_SES) {
         this.sourceAddress = config.aws_source_address ?? "";
-        const ses = new aws.SES({
+        const sesClient = new SESv2Client({
           region: config.aws_region,
           credentials: {
             accessKeyId:
@@ -166,7 +166,7 @@ export class Mailer {
 
         // create Nodemailer SES transporter
         this.transporter = nodemailer.createTransport({
-          SES: { ses, aws },
+          SES: { sesClient, SendEmailCommand },
         });
       }
 

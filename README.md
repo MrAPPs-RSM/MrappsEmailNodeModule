@@ -4,7 +4,7 @@ Email handler for Typescript
 
 ## Requirements:
 
-- Typescript +3.9.7
+- Typescript 5.*
 
 ## Installation:
 
@@ -163,15 +163,3 @@ const html = await mailer.compose(emailParts, company);
 const result = await mailer.send('subject', 'from', ['to1', 'to2'], html);
 ```
 
-## Test:
-
-### Requirements:
-
-- Mocha
-- Chai
-
-### Run tests:
-
-```bash
-npm test
-```
