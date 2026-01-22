@@ -1,3 +1,10 @@
+## [3.4.7](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.4.6...3.4.7) (2026-01-22)
+
+
+### Bug Fixes
+
+* updated nodemailer to v7 and node >=22 ([6a6f2ac](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/6a6f2acea4ccce9167591554d74ecc37a30a25e1))
+
 ## [3.4.6](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.4.5...3.4.6) (2026-01-22)
 
 
