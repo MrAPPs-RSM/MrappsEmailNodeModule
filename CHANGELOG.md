@@ -1,3 +1,10 @@
+# [3.5.0](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.4.7...3.5.0) (2026-04-13)
+
+
+### Features
+
+* update node mailer to version 8 - twig to version 3 ([876ef10](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/876ef10a3000096126b0ce18bb3a72b646218cce))
+
 ## [3.4.7](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.4.6...3.4.7) (2026-01-22)
 
 
