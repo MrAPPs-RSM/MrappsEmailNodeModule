@@ -59,9 +59,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Update npm
-        run: npm install -g npm@latest
-
       - name: Remove legacy npm config
         run: |
           rm -f .npmrc
@@ -77,7 +74,8 @@ jobs:
 
       - name: Debug versions
         run: |
-          echo "Local package version:"
+          echo "RELEASE_VERSION: ${RELEASE_VERSION}"
+          echo "Local package.json version:"
           node -p "require('./package.json').version"
           echo "Published npm version:"
           npm view @mrapps-rsm/mrappsemailnodemodule version --registry=https://registry.npmjs.org
