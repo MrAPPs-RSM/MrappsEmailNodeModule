@@ -1,3 +1,10 @@
+## [3.5.2](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.5.1...3.5.2) (2026-06-19)
+
+
+### Bug Fixes
+
+* workflow ([5d4b8b1](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/5d4b8b1f76d49f23a464b5ff7224fd88c225976d))
+
 ## [3.5.1](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.5.0...3.5.1) (2026-06-19)
 
 
