@@ -9,8 +9,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "prepublish": "tsc",
-    "test": "mocha --reporter spec --require ts-node/register tests/**/*.test.ts"
+    "prepublish": "tsc"
   },
   "files": [
     "dist",

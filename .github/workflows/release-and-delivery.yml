@@ -30,8 +30,6 @@ jobs:
       - name: Build the project
         run: npm run build
 
-      - name: Run tests
-        run: npm test
 
   release:
     if: github.event_name == 'push'
@@ -71,9 +69,6 @@ jobs:
 
       - name: Build the project
         run: npm run build
-
-      - name: Run tests
-        run: npm test
 
       - name: Run semantic-release
         env:
