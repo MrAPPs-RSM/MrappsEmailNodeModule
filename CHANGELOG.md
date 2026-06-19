@@ -1,3 +1,12 @@
+## [3.5.1](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.5.0...3.5.1) (2026-06-19)
+
+
+### Bug Fixes
+
+* github workflow ([8cab086](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/8cab0863813d03998c78d157748739cff1a356f3))
+* npm publish ([ba0356e](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/ba0356e6b957c83fb8934019fabacc8ed22be4e6))
+* updated nodemailer to 9.0.1 ([6555774](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/655577462f1aee673aa569c8b0138159dd33e55e))
+
 # [3.5.0](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.4.7...3.5.0) (2026-04-13)
 
 
