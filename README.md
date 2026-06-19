@@ -5,6 +5,7 @@ Email handler for Typescript
 ## Requirements:
 
 - Typescript 5.*
+- Node.js >=22 <25
 
 ## Installation:
 
