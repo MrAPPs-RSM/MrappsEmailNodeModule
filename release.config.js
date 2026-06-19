@@ -4,6 +4,7 @@ echo "RELEASE_VERSION=\${nextRelease.version}" >> $GITHUB_ENV
 `;
 
 const publishCommands = `
+git push --force origin \${nextRelease.version} || exit 3
 echo "release_status=released" >> $GITHUB_ENV
 `;
 
