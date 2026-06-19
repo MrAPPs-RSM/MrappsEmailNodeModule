@@ -8,17 +8,20 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: "22.x"
+          node-version: "24"
           cache: "npm"
 
       - name: Install dependencies
@@ -26,6 +29,9 @@ jobs:
 
       - name: Build the project
         run: npm run build
+
+      - name: Run tests
+        run: npm test
 
   release:
     if: github.event_name == 'push'
@@ -40,22 +46,22 @@ jobs:
       NPM_CONFIG_PROVENANCE: true
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           persist-credentials: true
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: "22.x"
-          cache: "npm"
+          node-version: "24"
           registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Upgrade npm
+      - name: Update npm
         run: npm install -g npm@latest
 
       - name: Remove legacy npm config
@@ -66,10 +72,20 @@ jobs:
       - name: Build the project
         run: npm run build
 
+      - name: Run tests
+        run: npm test
+
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx semantic-release
+
+      - name: Debug versions
+        run: |
+          echo "Local package version:"
+          node -p "require('./package.json').version"
+          echo "Published npm version:"
+          npm view @mrapps-rsm/mrappsemailnodemodule version --registry=https://registry.npmjs.org
 
       - name: Publish package to npm with Trusted Publishing
         run: npm publish --access public
