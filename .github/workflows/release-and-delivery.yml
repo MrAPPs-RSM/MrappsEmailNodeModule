@@ -36,11 +36,14 @@ jobs:
       issues: write
       pull-requests: write
       id-token: write
+    env:
+      NPM_CONFIG_PROVENANCE: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -55,6 +58,11 @@ jobs:
       - name: Upgrade npm
         run: npm install -g npm@latest
 
+      - name: Remove legacy npm config
+        run: |
+          rm -f .npmrc
+          npm config delete always-auth || true
+
       - name: Build the project
         run: npm run build
 
@@ -64,4 +72,4 @@ jobs:
         run: npx semantic-release
 
       - name: Publish package to npm with Trusted Publishing
-        run: npm publish --provenance
+        run: npm publish --access public
