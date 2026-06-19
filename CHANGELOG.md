@@ -1,3 +1,10 @@
+## [3.5.5](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.5.4...3.5.5) (2026-06-19)
+
+
+### Bug Fixes
+
+* release config ([2b1177b](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/2b1177b063e0439098de034fc3837c3356dda4f7))
+
 ## [3.5.4](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.5.3...3.5.4) (2026-06-19)
 
 
