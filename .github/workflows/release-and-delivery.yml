@@ -42,10 +42,12 @@ jobs:
         with:
           node-version: "22.x"
           cache: "npm"
+          registry-url: 'https://registry.npmjs.org'
       - name: Install dependencies
         run: npm ci
+      - name: Upgrade npm (richiesto v11.5.1+)
+        run: npm install -g npm@latest
       - name: Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release
+        run: npx semantic-release --publish-result ./publish-result.json
