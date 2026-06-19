@@ -1,6 +1,6 @@
 {
   "name": "@mrapps-rsm/mrappsemailnodemodule",
-  "version": "3.5.0",
+  "version": "3.5.1",
   "description": "Node module for email",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -36,8 +36,8 @@
   },
   "homepage": "https://github.com/MrAPPs-RSM/MrappsEmailNodeModule#readme",
   "dependencies": {
-    "@aws-sdk/client-sesv2": "^3.1029.0",
-    "nodemailer": "8.0.5",
+    "@aws-sdk/client-sesv2": "^3.1072.0",
+    "nodemailer": "9.0.1",
     "twig": "3.0.0"
   },
   "devDependencies": {
@@ -46,8 +46,8 @@
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/npm": "^13.1.5",
-    "@types/node": "^22.19.17",
-    "@types/nodemailer": "^8.0.0",
+    "@types/node": "^22.19.21",
+    "@types/nodemailer": "^8.0.1",
     "@types/twig": "1.12.17"
   }
 }
