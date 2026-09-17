@@ -233,7 +233,7 @@ export class Mailer {
         path.resolve(__dirname, "../views/parts/ical_file.ics.twig"),
         {
           filename: "ical_file.ics.twig",
-          data,
+          settings: Object.assign(data),
         },
         (err: Error, html: any) => {
           if (err) {

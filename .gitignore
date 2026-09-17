@@ -3,3 +3,4 @@ node_modules/
 tsconfig.tsbuild*
 tests
 dist/
+coverage/

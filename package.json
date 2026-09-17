@@ -9,7 +9,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "prepublish": "tsc"
+    "prepublish": "tsc",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "files": [
     "dist",
@@ -37,7 +39,7 @@
   "homepage": "https://github.com/MrAPPs-RSM/MrappsEmailNodeModule#readme",
   "dependencies": {
     "@aws-sdk/client-sesv2": "^3.1072.0",
-    "nodemailer": "9.0.1",
+    "nodemailer": "^10.0.10",
     "twig": "3.0.0"
   },
   "devDependencies": {
@@ -47,9 +49,11 @@
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^11.0.6",
     "@semantic-release/release-notes-generator": "^14.1.0",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.19.21",
-    "@types/nodemailer": "^8.0.1",
     "@types/twig": "1.12.17",
+    "jest": "^30.5.1",
+    "ts-jest": "^29.4.12",
     "typescript": "5.9.3"
   }
 }
