@@ -1,3 +1,10 @@
+## [3.5.8](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.5.7...3.5.8) (2026-10-09)
+
+
+### Bug Fixes
+
+* client handling - twig issues ([14538f6](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/14538f6c5b89462eb4fca97c7adff8ea7b412cf8))
+
 ## [3.5.7](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.5.6...3.5.7) (2026-09-17)
 
 
