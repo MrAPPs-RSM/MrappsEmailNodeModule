@@ -1,3 +1,10 @@
+## [3.5.7](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.5.6...3.5.7) (2026-09-17)
+
+
+### Bug Fixes
+
+* upgraded to nodemailer 10 - added test coverage ([b9334e8](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/b9334e880e738ce17324c20a24da105c82f7c347))
+
 ## [3.5.6](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.5.5...3.5.6) (2026-06-19)
 
 
