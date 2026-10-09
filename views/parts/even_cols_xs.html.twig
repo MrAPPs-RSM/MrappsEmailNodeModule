@@ -30,11 +30,11 @@
                                 <td style="padding: 10px; text-align: center">
                                     {% if row.link is defined and row.link is not empty %}
                                         <a href="{{ row.link }}"><img src="{{ row.imageUrl }}" width="{{ imgSize }}"
-                                                                      height="{{ imgSize }}" alt="alt_text" border="0"
+                                                                      height="{{ imgSize }}" alt="{{ row.alt|default('') }}" border="0"
                                                                       class="fluid"></a>
                                     {% else %}
                                         <img src="{{ row.imageUrl }}" width="{{ imgSize }}" height="{{ imgSize }}"
-                                             alt="alt_text"
+                                             alt="{{ row.alt|default('') }}"
                                              border="0" class="fluid">
                                     {% endif %}
                                 </td>

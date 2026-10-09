@@ -10,5 +10,8 @@ export {
   EmailAttachment,
   EmailMetadata,
   EmailMessage,
+  EmailPartDirection,
   EventAttribute,
+  SendMultiFailure,
+  SendMultiResult,
 } from "./mailer";

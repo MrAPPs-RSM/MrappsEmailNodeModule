@@ -2,7 +2,7 @@ import * as nodemailer from "nodemailer";
 import * as twig from "twig";
 import path from "path";
 import { Readable } from "stream";
-import { SESv2Client,SendEmailCommand } from "@aws-sdk/client-sesv2";
+import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
 
 export enum TransportType {
   SMTP = "SMTP",
@@ -42,17 +42,22 @@ export enum EmailPartType {
   Border = "border",
 }
 
+export type EmailPartDirection = "left" | "right";
+
 export type EmailPartRow = {
   imageUrl: string;
   description: string;
+  link?: string;
+  alt?: string;
 };
 
 export interface EmailPart {
   type: EmailPartType;
   imageUrl?: string;
+  alt?: string;
   title?: string;
   description?: string;
-  direction?: string;
+  direction?: EmailPartDirection;
   link?: string;
   linkTitle?: string;
   backgroundUrl?: string;
@@ -65,13 +70,6 @@ export interface CompanyInfo {
   companyName: string;
   street: string;
   otherInfo?: string;
-}
-
-export interface EmailOption {
-  subject: string;
-  from: string;
-  to: Array<string>;
-  html: any;
 }
 
 export interface EventAttribute {
@@ -103,7 +101,7 @@ export interface EmailAttachment extends AttachmentLike {
   contentType?: string;
   contentTransferEncoding?: "7bit" | "base64" | "quoted-printable" | false;
   contentDisposition?: "attachment" | "inline";
-  headers?: any;
+  headers?: nodemailer.Headers;
   raw?: string | Buffer | Readable | AttachmentLike;
 }
 
@@ -117,13 +115,91 @@ export interface EmailMessage {
   subject: string;
   from: string;
   to: Array<string>;
-  html: any;
+  html: string;
   metadata?: EmailMetadata;
+}
+
+export interface SendMultiFailure {
+  message: EmailMessage;
+  error: Error;
+}
+
+export interface SendMultiResult {
+  sent: number;
+  failed: SendMultiFailure[];
+  remaining: EmailMessage[];
+}
+
+const DEFAULT_AWS_REGION = "eu-west-1";
+const DEFAULT_TRUNCATE_LENGTH = 10;
+const ALLOWED_URL_SCHEMES = new Set(["http", "https", "mailto", "tel", "cid"]);
+const ICS_MAX_LINE_OCTETS = 75;
+
+twig.extendFilter("truncate", (value: unknown, params: false | any[]) => {
+  const text = value == null ? "" : String(value);
+  const length =
+    Array.isArray(params) && params.length > 0 ? params[0] : DEFAULT_TRUNCATE_LENGTH;
+  return text.length > length ? text.substring(0, length) + "..." : text;
+});
+
+// RFC 5545 §3.3.11: escape backslash, semicolon, comma and line breaks in TEXT values.
+twig.extendFilter("ics_escape", (value: unknown) =>
+  (value == null ? "" : String(value))
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\r\n|\r|\n/g, "\\n")
+);
+
+// RFC 5545 §3.2: parameter values are always emitted quoted, so only DQUOTE and control characters are illegal.
+twig.extendFilter("ics_param", (value: unknown) =>
+  (value == null ? "" : String(value)).replace(/["\x00-\x1f\x7f]/g, "")
+);
+
+function assertSafeUrl(value: string | undefined, field: string): void {
+  if (!value) {
+    return;
+  }
+  const match = /^\s*([a-z][a-z0-9+.-]*):/i.exec(value);
+  if (match && !ALLOWED_URL_SCHEMES.has(match[1].toLowerCase())) {
+    throw new Error(`Unsupported URL scheme "${match[1]}" in ${field}`);
+  }
+}
+
+function assertRecipient(address: string): void {
+  if (typeof address !== "string" || address.trim() === "" || /[,;\r\n]/.test(address)) {
+    throw new Error(`Invalid recipient address: ${JSON.stringify(address)}`);
+  }
+}
+
+function icsTimestamp(date: Date): string {
+  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+}
+
+function foldIcsLine(line: string): string {
+  const out: string[] = [];
+  let current = "";
+  let octets = 0;
+  for (const char of line) {
+    const size = Buffer.byteLength(char);
+    // continuation lines start with a space, which costs one octet
+    const limit = out.length === 0 ? ICS_MAX_LINE_OCTETS : ICS_MAX_LINE_OCTETS - 1;
+    if (octets + size > limit) {
+      out.push(current);
+      current = "";
+      octets = 0;
+    }
+    current += char;
+    octets += size;
+  }
+  out.push(current);
+  return out.join("\r\n ");
 }
 
 export class Mailer {
   public transporter?: nodemailer.Transporter;
   private sesClient?: SESv2Client;
+  private ownsTransporter = false;
   private sourceAddress: string = "";
 
   private style: Style = {
@@ -138,133 +214,133 @@ export class Mailer {
   };
 
   constructor(config?: Configuration) {
-    if (config) {
-      if (config.transport === TransportType.SMTP) {
-        this.sourceAddress = config.user ?? "";
-        this.transporter = nodemailer.createTransport({
-          pool: true,
-          host: config.host,
-          port: config.port,
-          auth: {
-            type: "login",
-            user: config.user ?? "",
-            pass: config.password ?? "",
-          },
-        });
-      } else if (config.transport === TransportType.AMAZON_SES) {
-        this.sourceAddress = config.aws_source_address ?? "";
-        this.sesClient = new SESv2Client({
-          region: config.aws_region,
-          credentials: {
-            accessKeyId:
-              config.aws_access_key_id ?? process.env.AWS_ACCESS_KEY_ID ?? "",
-            secretAccessKey:
-              config.aws_secret_access_key ??
-              process.env.AWS_SECRET_ACCESS_KEY ??
-              "",
-          },
-        });
+    if (!config) {
+      return;
+    }
 
-        // create Nodemailer SES transporter
-        this.transporter = nodemailer.createTransport({
-          SES: { sesClient: this.sesClient, SendEmailCommand },
-        });
+    const transport = config.transport ?? TransportType.SMTP;
+
+    if (transport === TransportType.SMTP) {
+      this.sourceAddress = config.user ?? "";
+      this.transporter = nodemailer.createTransport({
+        pool: true,
+        host: config.host,
+        port: config.port,
+        auth: {
+          type: "login",
+          user: config.user ?? "",
+          pass: config.password ?? "",
+        },
+      });
+    } else if (transport === TransportType.AMAZON_SES) {
+      this.sourceAddress = config.aws_source_address ?? "";
+      const accessKeyId = config.aws_access_key_id;
+      const secretAccessKey = config.aws_secret_access_key;
+      if ((accessKeyId === undefined) !== (secretAccessKey === undefined)) {
+        throw new Error(
+          "aws_access_key_id and aws_secret_access_key must be provided together"
+        );
       }
 
-      // Twig extension
-      twig.extendFilter("truncate", (string: string | null | undefined, params: false | any[]) => {
-        const text = string ?? "";
-        const length =
-          Array.isArray(params) && params.length > 0 ? params[0] : 10; // Default length if not provided
-        return text.length > length ? text.substring(0, length) + "..." : text;
+      // Without explicit credentials the SDK's default provider chain applies
+      // (env vars, shared config, ECS/EC2/IAM roles).
+      this.sesClient = new SESv2Client({
+        region: config.aws_region ?? DEFAULT_AWS_REGION,
+        ...(accessKeyId !== undefined && secretAccessKey !== undefined
+          ? { credentials: { accessKeyId, secretAccessKey } }
+          : {}),
       });
+
+      this.transporter = nodemailer.createTransport({
+        SES: { sesClient: this.sesClient, SendEmailCommand },
+      });
+    } else {
+      throw new Error(`Unsupported transport type: ${String(transport)}`);
     }
+
+    this.ownsTransporter = true;
   }
 
   setTransporter(transporter: nodemailer.Transporter) {
+    if (this.ownsTransporter) {
+      this.close();
+    }
     this.transporter = transporter;
+    this.ownsTransporter = false;
   }
 
   close(): void {
     this.transporter?.close();
     this.sesClient?.destroy();
+    this.sesClient = undefined;
   }
 
-  setStyle(style: Style): void {
-    this.style = style;
+  async verify(): Promise<true> {
+    if (!this.transporter) {
+      throw new Error("Transporter not initialized");
+    }
+    return this.transporter.verify();
   }
 
-  compose(
+  setStyle(style: Partial<Style>): void {
+    this.style = { ...this.style, ...style };
+  }
+
+  async compose(
     emailParts: Array<EmailPart>,
     companyInfo: CompanyInfo
-  ): Promise<any> {
-    return new Promise((resolve, reject) => {
-      twig.renderFile(
-        path.resolve(__dirname, "../views/index.html.twig"),
-        {
-          filename: "index.html.twig",
-          settings: Object.assign({
-            //Email style
-            backgroundColor: this.style.backgroundColor,
-            contentColor: this.style.contentColor,
-            boldColor: this.style.boldColor,
-            textColor: this.style.textColor,
-            mainColor: this.style.mainColor,
-            mainButtonColor: this.style.mainButtonColor,
-            mainColorHover: this.style.mainColorHover,
-            textOnMainColor: this.style.textOnMainColor,
-            //Email data
-            logoUrl: companyInfo.logoUrl,
-            companyName: companyInfo.companyName,
-            street: companyInfo.street,
-            otherInfo: companyInfo.otherInfo,
-            emailParts: emailParts,
-          }),
-        },
-        (err: Error, html: any) => {
-          if (err) {
-            reject(err);
-            return;
-          }
+  ): Promise<string> {
+    assertSafeUrl(companyInfo.logoUrl, "companyInfo.logoUrl");
+    emailParts.forEach((part, index) => {
+      assertSafeUrl(part.imageUrl, `emailParts[${index}].imageUrl`);
+      assertSafeUrl(part.link, `emailParts[${index}].link`);
+      assertSafeUrl(part.backgroundUrl, `emailParts[${index}].backgroundUrl`);
+      part.rows?.forEach((row, rowIndex) => {
+        assertSafeUrl(row.imageUrl, `emailParts[${index}].rows[${rowIndex}].imageUrl`);
+        assertSafeUrl(row.link, `emailParts[${index}].rows[${rowIndex}].link`);
+      });
+    });
 
-          resolve(html);
-        }
-      );
+    return this.renderTemplate("../views/index.html.twig", {
+      settings: {
+        ...this.style,
+        logoUrl: companyInfo.logoUrl,
+        companyName: companyInfo.companyName,
+        street: companyInfo.street,
+        otherInfo: companyInfo.otherInfo,
+        emailParts,
+      },
     });
   }
 
   async generateCal(data: EventAttribute): Promise<string> {
-    return new Promise((resolve, reject) => {
-      twig.renderFile(
-        path.resolve(__dirname, "../views/parts/ical_file.ics.twig"),
-        {
-          filename: "ical_file.ics.twig",
-          settings: Object.assign(data),
-        },
-        (err: Error, html: any) => {
-          if (err) {
-            reject(err);
-            return;
-          }
-          resolve(html);
-        }
-      );
+    const rendered = this.renderTemplate("../views/parts/ical_file.ics.twig", {
+      settings: { ...data, dtstamp: icsTimestamp(new Date()) },
     });
+
+    return rendered
+      .split(/\r?\n/)
+      .filter((line) => line !== "")
+      .map(foldIcsLine)
+      .join("\r\n")
+      .concat("\r\n");
   }
 
   async send(
     subject: string,
     from: string,
     to: Array<string>,
-    html: any,
+    html: string,
     metadata?: EmailMetadata
   ): Promise<nodemailer.SentMessageInfo> {
     if (!this.transporter) {
       throw new Error("Transporter not initialized");
     }
 
+    to.forEach(assertRecipient);
+
     let options: nodemailer.SendMailOptions = {
-      to: to.join(","),
+      to,
       subject,
       sender: this.sourceAddress,
       from: from,
@@ -298,15 +374,39 @@ export class Mailer {
     return await this.transporter.sendMail(options);
   }
 
-  async sendMulti(messages: EmailMessage[]): Promise<void> {
+  async sendMulti(messages: EmailMessage[]): Promise<SendMultiResult> {
     if (!this.transporter) {
       throw new Error("Transporter not initialized");
     }
 
-    // Send next when transporter is ready
-    while (this.transporter.isIdle() && messages.length > 0) {
-      await this.transporter.sendMail(messages[0]);
-      messages.shift();
+    const result: SendMultiResult = { sent: 0, failed: [], remaining: [] };
+    let index = 0;
+
+    // Send next while the pooled transport reports a free connection
+    while (index < messages.length && this.transporter.isIdle()) {
+      const message = messages[index];
+      try {
+        await this.transporter.sendMail(message);
+        result.sent++;
+      } catch (error) {
+        result.failed.push({
+          message,
+          error: error instanceof Error ? error : new Error(String(error)),
+        });
+      }
+      index++;
     }
+
+    result.remaining = messages.slice(index);
+    return result;
+  }
+
+  private renderTemplate(relativePath: string, context: Record<string, unknown>): string {
+    const params: twig.Parameters & { rethrow: boolean } = {
+      path: path.resolve(__dirname, relativePath),
+      async: false,
+      rethrow: true,
+    };
+    return String(twig.twig(params).render(context));
   }
 }

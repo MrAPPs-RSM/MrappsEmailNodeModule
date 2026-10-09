@@ -1,22 +1,23 @@
 BEGIN:VCALENDAR
 VERSION:2.0
+PRODID:-//MrApps//MrappsEmailNodeModule//EN
 CALSCALE:GREGORIAN
 METHOD:REQUEST
 BEGIN:VEVENT
-DTSTART:{{ settings.start }}
-DTEND:{{ settings.end }}
-DTSTAMP:{{ settings.lastModified }}
-ORGANIZER;CN={{ settings.organizer.name }}:mailto:{{ settings.organizer.email }}
-UID:{{ settings.uid }}
-ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN={{ settings.partecipant.email }};X-NUM-GUESTS=0:mailto:{{ settings.partecipant.email }}
+DTSTART:{{ settings.start | ics_escape }}
+DTEND:{{ settings.end | ics_escape }}
+DTSTAMP:{{ settings.dtstamp }}
+ORGANIZER;CN="{{ settings.organizer.name | ics_param }}":mailto:{{ settings.organizer.email | ics_escape }}
+UID:{{ settings.uid | ics_escape }}
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN="{{ settings.partecipant.email | ics_param }}";X-NUM-GUESTS=0:mailto:{{ settings.partecipant.email | ics_escape }}
 X-MICROSOFT-CDO-OWNERAPPTID:307924667
-CREATED:{{ settings.lastModified }}
-DESCRIPTION:{{ settings.description }}
-LAST-MODIFIED:{{ settings.lastModified }}
+CREATED:{{ settings.created | ics_escape }}
+DESCRIPTION:{{ settings.description | ics_escape }}
+LAST-MODIFIED:{{ settings.lastModified | ics_escape }}
 LOCATION:
 SEQUENCE:0
 STATUS:CONFIRMED
-SUMMARY:{{ settings.title }}
+SUMMARY:{{ settings.title | ics_escape }}
 TRANSP:OPAQUE
 END:VEVENT
 END:VCALENDAR

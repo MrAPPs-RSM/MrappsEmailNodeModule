@@ -3,7 +3,7 @@
     <meta charset="utf-8"> <!-- utf-8 works for most cases -->
     <meta name="viewport" content="width=device-width"> <!-- Forcing initial-scale shouldn't be necessary -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge"> <!-- Use the latest (edge) version of IE rendering engine -->
-    <title></title> <!-- The title tag shows in email notifications, like Android 4.4. -->
+    <title>{{ settings.companyName }}</title> <!-- The title tag shows in email notifications, like Android 4.4. -->
     <!-- Web Font / @font-face -->
     <!-- NOTE: If web fonts are not required, lines 9 - 26 can be safely removed. -->
     <!-- Desktop Outlook chokes on web font references and defaults to Times New Roman, so we force a safe fallback font. -->
@@ -216,9 +216,9 @@
                        style="-moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);">
                     {% for part in settings.emailParts %}
                         {% if part.type=='image' %}
-                            {% include './parts/image.html.twig' with {'imageUrl':part.imageUrl|default(null)} %}
+                            {% include './parts/image.html.twig' with {'imageUrl':part.imageUrl|default(null),'alt':part.alt|default(part.title|default(''))} %}
                         {% elseif part.type=='blocked_image' %}
-                            {% include './parts/blocked_image.html.twig' with {'imageUrl':part.imageUrl|default(null)} %}
+                            {% include './parts/blocked_image.html.twig' with {'imageUrl':part.imageUrl|default(null),'alt':part.alt|default(part.title|default(''))} %}
                         {% elseif part.type=='one_col_text' %}
                             {% include './parts/one_col_text.html.twig' with {'title':part.title|default(null),'description':part.description|default(''),'link':part.link|default(null),'linkTitle':part.linkTitle|default(null)} %}
                         {% elseif part.type=='bg_image_with_text' %}
@@ -257,7 +257,7 @@
                                 {% endif %}
                             {% endfor %}
                         {% elseif part.type=='thumbnail_text' %}
-                            {% include './parts/thumbnail_text.html.twig' with {'direction':part.direction|default(null),'imageUrl':part.imageUrl|default(null),'title':part.title|default(null),'description':part.description|default(null),'link':part.link|default(null),'linkTitle':part.linkTitle|default(null)} %}
+                            {% include './parts/thumbnail_text.html.twig' with {'direction':part.direction|default(null),'imageUrl':part.imageUrl|default(null),'alt':part.alt|default(part.title|default('')),'title':part.title|default(null),'description':part.description|default(null),'link':part.link|default(null),'linkTitle':part.linkTitle|default(null)} %}
                         {% endif %}
                     {% endfor %}
                 </table>
