@@ -1,3 +1,10 @@
+# [3.6.0](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.5.8...3.6.0) (2026-10-09)
+
+
+### Features
+
+* improved sendMulti - exposed verify method - handled aws env retrieval ([e2e11c0](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/e2e11c05ddbcc82ed3c7634b8eee6e9437dde31f))
+
 ## [3.5.8](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.5.7...3.5.8) (2026-10-09)
 
 
