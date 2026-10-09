@@ -84,4 +84,5 @@ jobs:
           npm view @mrapps-rsm/mrappsemailnodemodule version --registry=https://registry.npmjs.org
 
       - name: Publish package to npm with Trusted Publishing
+        if: env.release_status == 'released'
         run: npm publish --access public

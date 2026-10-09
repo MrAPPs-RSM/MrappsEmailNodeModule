@@ -246,7 +246,7 @@
                                 {% if loop.index0%3==0 %}
                                     {% if loop.last %}
                                         {% set rowCells=[row] %}
-                                    {% elseif loop.index<=loop.length-3 %}
+                                    {% elseif loop.index<=loop.length-2 %}
                                         {% set rowCells=[row,part.rows[loop.index0+1],part.rows[loop.index0+2]] %}
                                     {% else %}
                                         {% set rowCells=[row,part.rows[loop.index0+1]] %}

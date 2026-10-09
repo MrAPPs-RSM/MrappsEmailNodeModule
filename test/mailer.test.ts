@@ -32,7 +32,21 @@ function fakeTransporter() {
   return {
     sendMail: jest.fn().mockResolvedValue({ messageId: "abc-123" }),
     isIdle: jest.fn().mockReturnValue(true),
+    close: jest.fn(),
   };
+}
+
+const companyInfo: CompanyInfo = {
+  logoUrl: "https://example.com/logo.png",
+  companyName: "Acme Inc.",
+  street: "123 Main St",
+};
+
+function rows(count: number) {
+  return Array.from({ length: count }, (_, i) => ({
+    imageUrl: `https://example.com/img${i}.png`,
+    description: `ROW${i}`,
+  }));
 }
 
 describe("Mailer", () => {
@@ -174,6 +188,36 @@ describe("Mailer", () => {
       mailer.setTransporter(transporter as unknown as nodemailer.Transporter);
 
       expect(mailer.transporter).toBe(transporter);
+    });
+  });
+
+  describe("close", () => {
+    it("closes the transporter", () => {
+      const transporter = fakeTransporter();
+      const mailer = new Mailer();
+      mailer.setTransporter(transporter as unknown as nodemailer.Transporter);
+
+      mailer.close();
+
+      expect(transporter.close).toHaveBeenCalledTimes(1);
+    });
+
+    it("also destroys the SES client when configured for AMAZON_SES", () => {
+      const transporter = fakeTransporter();
+      createTransportMock.mockReturnValue(transporter);
+      const mailer = new Mailer({ transport: TransportType.AMAZON_SES, aws_access_key_id: "k", aws_secret_access_key: "s" });
+      const destroy = jest.spyOn((mailer as any).sesClient, "destroy").mockImplementation(() => {});
+
+      mailer.close();
+
+      expect(transporter.close).toHaveBeenCalledTimes(1);
+      expect(destroy).toHaveBeenCalledTimes(1);
+    });
+
+    it("is a no-op when no transporter was created", () => {
+      const mailer = new Mailer();
+
+      expect(() => mailer.close()).not.toThrow();
     });
   });
 
@@ -341,6 +385,149 @@ describe("Mailer", () => {
       expect(html).toEqual(expect.any(String));
       expect(html).toContain("Acme Inc.");
       expect(html).toContain("123 Main St");
+    });
+
+    it("applies the configured style colors to bg_image_with_text and thumbnail_text parts", async () => {
+      const mailer = new Mailer();
+      mailer.setStyle({
+        backgroundColor: "#111111",
+        contentColor: "#222222",
+        boldColor: "#333333",
+        textColor: "#444444",
+        mainColor: "#555555",
+        mainButtonColor: "#666666",
+        mainColorHover: "#777777",
+        textOnMainColor: "#888888",
+      });
+
+      const emailParts: EmailPart[] = [
+        {
+          type: EmailPartType.BgImageWithText,
+          backgroundUrl: "https://example.com/bg.png",
+          description: "Some text",
+        },
+        {
+          type: EmailPartType.ThumbnailText,
+          imageUrl: "https://example.com/thumb.png",
+          title: "Title",
+          description: "Description",
+        },
+      ];
+
+      const html = await mailer.compose(emailParts, companyInfo);
+
+      // bg_image_with_text
+      expect(html).toContain('bgcolor="#555555"');
+      expect(html).toContain("color: #888888");
+      // thumbnail_text
+      expect(html).toContain("color: #444444;");
+      expect(html).toContain("color:#333333;");
+    });
+
+    it("applies the configured style colors to two/three even cols parts", async () => {
+      const mailer = new Mailer();
+      mailer.setStyle({
+        backgroundColor: "#111111",
+        contentColor: "#222222",
+        boldColor: "#333333",
+        textColor: "#444444",
+        mainColor: "#555555",
+        mainButtonColor: "#666666",
+        mainColorHover: "#777777",
+        textOnMainColor: "#888888",
+      });
+
+      for (const type of [EmailPartType.TwoEvenColsXs, EmailPartType.ThreeEvenColsXs]) {
+        const html = await mailer.compose([{ type, title: "Cols", rows: rows(2) }], companyInfo);
+
+        expect(html).toContain("color:#333333;");
+        expect(html).toContain("color: #444444;");
+        expect(html).not.toMatch(/color:\s*;/);
+      }
+    });
+
+    it.each([1, 2, 3, 4, 5, 6, 7])(
+      "renders every row exactly once in two/three even cols parts (%i rows)",
+      async (count) => {
+        const mailer = new Mailer();
+
+        for (const type of [EmailPartType.TwoEvenColsXs, EmailPartType.ThreeEvenColsXs]) {
+          const html = await mailer.compose([{ type, rows: rows(count) }], companyInfo);
+
+          for (let i = 0; i < count; i++) {
+            expect(html.match(new RegExp(`ROW${i}\\b`, "g"))).toHaveLength(1);
+          }
+        }
+      }
+    );
+
+    it("emits the xs-invariate class matching the responsive CSS when xsInvariate is set", async () => {
+      const mailer = new Mailer();
+
+      const withFlag = await mailer.compose(
+        [{ type: EmailPartType.TwoEvenColsXs, xsInvariate: true, rows: rows(2) }],
+        companyInfo
+      );
+      const withoutFlag = await mailer.compose(
+        [{ type: EmailPartType.TwoEvenColsXs, rows: rows(2) }],
+        companyInfo
+      );
+
+      expect(withFlag).toContain(".column-2.xs-invariate");
+      expect(withFlag).toContain('class="column-2 xs-invariate"');
+      expect(withoutFlag).not.toContain("xs-invariate\"");
+    });
+
+    it("renders a thumbnail part without description without template errors", async () => {
+      const mailer = new Mailer({ transport: TransportType.SMTP });
+      const consoleError = jest.spyOn(console, "error").mockImplementation(() => {});
+
+      try {
+        const html = await mailer.compose(
+          [{ type: EmailPartType.ThumbnailText, imageUrl: "https://example.com/thumb.png", title: "Only title" }],
+          companyInfo
+        );
+
+        expect(consoleError).not.toHaveBeenCalled();
+        expect(html).toContain('src="https://example.com/thumb.png"');
+        expect(html).toContain("Only title");
+        expect(html).not.toContain("null");
+      } finally {
+        consoleError.mockRestore();
+      }
+    });
+
+    it("renders the thumbnail CTA button with linkTitle, falling back to the link", async () => {
+      const mailer = new Mailer({ transport: TransportType.SMTP });
+
+      const withTitle = await mailer.compose(
+        [
+          {
+            type: EmailPartType.ThumbnailText,
+            imageUrl: "https://example.com/thumb.png",
+            description: "Desc",
+            link: "https://example.com/go",
+            linkTitle: "Go now",
+          },
+        ],
+        companyInfo
+      );
+      const withoutTitle = await mailer.compose(
+        [
+          {
+            type: EmailPartType.ThumbnailText,
+            imageUrl: "https://example.com/thumb.png",
+            description: "Desc",
+            link: "https://example.com/go",
+          },
+        ],
+        companyInfo
+      );
+
+      expect(withTitle).toContain('href="https://example.com/go"');
+      expect(withTitle).toContain("Go now");
+      expect(withoutTitle).toContain('href="https://example.com/go"');
+      expect(withoutTitle.split("https://example.com/go")).toHaveLength(3);
     });
 
     it("truncates long text through the registered twig 'truncate' filter", async () => {

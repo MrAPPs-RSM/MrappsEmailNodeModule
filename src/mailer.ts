@@ -123,6 +123,7 @@ export interface EmailMessage {
 
 export class Mailer {
   public transporter?: nodemailer.Transporter;
+  private sesClient?: SESv2Client;
   private sourceAddress: string = "";
 
   private style: Style = {
@@ -152,7 +153,7 @@ export class Mailer {
         });
       } else if (config.transport === TransportType.AMAZON_SES) {
         this.sourceAddress = config.aws_source_address ?? "";
-        const sesClient = new SESv2Client({
+        this.sesClient = new SESv2Client({
           region: config.aws_region,
           credentials: {
             accessKeyId:
@@ -166,23 +167,27 @@ export class Mailer {
 
         // create Nodemailer SES transporter
         this.transporter = nodemailer.createTransport({
-          SES: { sesClient, SendEmailCommand },
+          SES: { sesClient: this.sesClient, SendEmailCommand },
         });
       }
 
       // Twig extension
-      twig.extendFilter("truncate", (string: string, params: false | any[]) => {
+      twig.extendFilter("truncate", (string: string | null | undefined, params: false | any[]) => {
+        const text = string ?? "";
         const length =
           Array.isArray(params) && params.length > 0 ? params[0] : 10; // Default length if not provided
-        return string.length > length
-          ? string.substring(0, length) + "..."
-          : string;
+        return text.length > length ? text.substring(0, length) + "..." : text;
       });
     }
   }
 
   setTransporter(transporter: nodemailer.Transporter) {
     this.transporter = transporter;
+  }
+
+  close(): void {
+    this.transporter?.close();
+    this.sesClient?.destroy();
   }
 
   setStyle(style: Style): void {
@@ -219,6 +224,7 @@ export class Mailer {
         (err: Error, html: any) => {
           if (err) {
             reject(err);
+            return;
           }
 
           resolve(html);
@@ -238,6 +244,7 @@ export class Mailer {
         (err: Error, html: any) => {
           if (err) {
             reject(err);
+            return;
           }
           resolve(html);
         }

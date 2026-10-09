@@ -4,7 +4,7 @@
     {% set imgSize=170 %}
 {% else %}
     {% if xsInvariate is not empty %}
-        {% set tdClass='column-2 xs_invariate' %}
+        {% set tdClass='column-2 xs-invariate' %}
     {% else %}
         {% set tdClass='column-2' %}
     {% endif %}
@@ -16,7 +16,7 @@
             <table cellspacing="0" cellpadding="0" border="0" width="100%">
                 <tr>
                     <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; padding: 10px; text-align: left;">
-                        <strong style="color:{{ boldColor }};">{{ title }}</strong>
+                        <strong style="color:{{ settings.boldColor }};">{{ title }}</strong>
                     </td>
                 </tr>
             </table>
@@ -40,7 +40,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: {{ textColor }}; padding: 0 10px 10px; text-align: left;"
+                                <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: {{ settings.textColor }}; padding: 0 10px 10px; text-align: left;"
                                     class="center-on-narrow">
                                     {{ row.description | raw }}
                                 </td>

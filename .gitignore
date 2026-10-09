@@ -4,3 +4,5 @@ tsconfig.tsbuild*
 tests
 dist/
 coverage/
+
+AUDIT.md

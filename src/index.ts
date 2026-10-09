@@ -9,4 +9,6 @@ export {
   EmailPartRow,
   EmailAttachment,
   EmailMetadata,
+  EmailMessage,
+  EventAttribute,
 } from "./mailer";
