@@ -215,53 +215,43 @@
                        width="600" class="email-container"
                        style="-moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);">
                     {% for part in settings.emailParts %}
-                        {% if part.type=='image' %}
-                            {% include './parts/image.html.twig' with {'imageUrl':part.imageUrl|default(null),'alt':part.alt|default(part.title|default(''))} %}
-                        {% elseif part.type=='blocked_image' %}
-                            {% include './parts/blocked_image.html.twig' with {'imageUrl':part.imageUrl|default(null),'alt':part.alt|default(part.title|default(''))} %}
-                        {% elseif part.type=='one_col_text' %}
-                            {% include './parts/one_col_text.html.twig' with {'title':part.title|default(null),'description':part.description|default(''),'link':part.link|default(null),'linkTitle':part.linkTitle|default(null)} %}
-                        {% elseif part.type=='bg_image_with_text' %}
-                            {% include './parts/bg_image_with_text.html.twig' with {'backgroundUrl':part.backgroundUrl|default(null),'description':part.description|default('')} %}
-                        {% elseif part.type=='border' %}
-                            {% include './parts/border.html.twig' %}
-                        {% elseif part.type=='two_even_cols_xs' %}
-                            {% set partTitle = part.title|default(null) %}
+                        {% assign imageAlt = part.alt | default: part.title | default: '' %}
+                        {% if part.type == 'image' %}
+                            {% render 'parts/image.html.liquid', imageUrl: part.imageUrl, alt: imageAlt %}
+                        {% elsif part.type == 'blocked_image' %}
+                            {% render 'parts/blocked_image.html.liquid', imageUrl: part.imageUrl, alt: imageAlt %}
+                        {% elsif part.type == 'one_col_text' %}
+                            {% render 'parts/one_col_text.html.liquid', settings: settings, title: part.title, description: part.description, link: part.link, linkTitle: part.linkTitle %}
+                        {% elsif part.type == 'bg_image_with_text' %}
+                            {% render 'parts/bg_image_with_text.html.liquid', settings: settings, backgroundUrl: part.backgroundUrl, description: part.description %}
+                        {% elsif part.type == 'border' %}
+                            {% render 'parts/border.html.liquid' %}
+                        {% elsif part.type == 'two_even_cols_xs' %}
+                            {% assign partTitle = part.title %}
                             {% for row in part.rows %}
-                                {% if loop.index0%2==0 %}
-
-                                    {% if loop.last %}
-                                        {% set rowCells=[row] %}
-                                    {% else %}
-                                        {% set rowCells=[row,part.rows[loop.index0+1]] %}
-                                    {% endif %}
-
-                                    {% include './parts/even_cols_xs.html.twig' with {'title':partTitle,'rows':rowCells|default(null),'xsInvariate':part.xsInvariate|default(null)} %}
-                                    {% set partTitle = null %}
+                                {% assign position = forloop.index0 | modulo: 2 %}
+                                {% if position == 0 %}
+                                    {% assign rowCells = part.rows | slice: forloop.index0, 2 %}
+                                    {% render 'parts/even_cols_xs.html.liquid', settings: settings, title: partTitle, rows: rowCells, xsInvariate: part.xsInvariate %}
+                                    {% assign partTitle = '' %}
                                 {% endif %}
                             {% endfor %}
-                        {% elseif part.type=='three_even_cols_xs' %}
-                            {% set partTitle = part.title|default(null) %}
+                        {% elsif part.type == 'three_even_cols_xs' %}
+                            {% assign partTitle = part.title %}
                             {% for row in part.rows %}
-                                {% if loop.index0%3==0 %}
-                                    {% if loop.last %}
-                                        {% set rowCells=[row] %}
-                                    {% elseif loop.index<=loop.length-2 %}
-                                        {% set rowCells=[row,part.rows[loop.index0+1],part.rows[loop.index0+2]] %}
-                                    {% else %}
-                                        {% set rowCells=[row,part.rows[loop.index0+1]] %}
-                                    {% endif %}
-
-                                    {% include './parts/even_cols_xs.html.twig' with {'title':partTitle,'rows':rowCells|default(null),'tdStyle':'three_columns'} %}
-                                    {% set partTitle = null %}
+                                {% assign position = forloop.index0 | modulo: 3 %}
+                                {% if position == 0 %}
+                                    {% assign rowCells = part.rows | slice: forloop.index0, 3 %}
+                                    {% render 'parts/even_cols_xs.html.liquid', settings: settings, title: partTitle, rows: rowCells, tdStyle: 'three_columns' %}
+                                    {% assign partTitle = '' %}
                                 {% endif %}
                             {% endfor %}
-                        {% elseif part.type=='thumbnail_text' %}
-                            {% include './parts/thumbnail_text.html.twig' with {'direction':part.direction|default(null),'imageUrl':part.imageUrl|default(null),'alt':part.alt|default(part.title|default('')),'title':part.title|default(null),'description':part.description|default(null),'link':part.link|default(null),'linkTitle':part.linkTitle|default(null)} %}
+                        {% elsif part.type == 'thumbnail_text' %}
+                            {% render 'parts/thumbnail_text.html.liquid', settings: settings, direction: part.direction, imageUrl: part.imageUrl, alt: imageAlt, title: part.title, description: part.description, link: part.link, linkTitle: part.linkTitle %}
                         {% endif %}
                     {% endfor %}
                 </table>
-                {% include './footer.html.twig' with {'companyName':settings.companyName,'street':settings.street,'otherInfo':settings.otherInfo|default(null)} %}
+                {% render 'footer.html.liquid', companyName: settings.companyName, street: settings.street, otherInfo: settings.otherInfo %}
             </center>
         </td>
     </tr>

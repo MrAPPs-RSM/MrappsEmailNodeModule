@@ -1,7 +1,7 @@
 # MrApps Email NodeModule
 
 Email handler for TypeScript: composes responsive HTML emails from a fixed set of
-building blocks (via [Twig](https://www.npmjs.com/package/twig) templates), sends them
+building blocks (via [LiquidJS](https://liquidjs.com) templates), sends them
 over SMTP or Amazon SES (via [nodemailer](https://www.npmjs.com/package/nodemailer)),
 and can generate `.ics` calendar invites.
 
@@ -35,6 +35,7 @@ import {
   SendMultiResult,
   SendMultiFailure,
   EventAttribute,
+  EventParticipant,
 } from '@mrapps-rsm/mrappsemailnodemodule';
 ```
 
@@ -53,7 +54,8 @@ import {
 | `EmailAttachment` | interface | A single attachment; same shape as a `nodemailer` attachment. |
 | `EmailMessage` | interface | One message for `sendMulti()`. |
 | `SendMultiResult` / `SendMultiFailure` | interface | Outcome report returned by `sendMulti()`. |
-| `EventAttribute` | interface | Input for `generateCal()`. |
+| `EventAttribute` | type | Input for `generateCal()`. |
+| `EventParticipant` | interface | `{ email }` — the attendee of an `EventAttribute`. |
 
 ## Configuration
 
@@ -136,8 +138,7 @@ Regardless of transport, every email sent via `mailer.send(...)` sets the `sende
 header from the configuration (`user` for SMTP, `aws_source_address` for SES), while the
 visible `from` address is whatever you pass as the `from` argument to `send()`. If you
 don't need a distinct envelope sender, set `user`/`aws_source_address` to the same
-address you plan to pass as `from`. Note that `sendMulti()` does **not** set `sender` —
-see [sendMulti](#sendmultimessages-emailmessage-promisesendmultiresult).
+address you plan to pass as `from`. `sendMulti()` behaves the same way.
 
 ### Unrecognized `transport`
 
@@ -215,21 +216,24 @@ current palette, so you can pass only the colors you want to change. Defaults:
 ### `compose(emailParts: Array<EmailPart>, companyInfo: CompanyInfo): Promise<string>`
 
 Renders the full HTML email (header with logo, a sequence of body parts, footer with
-company info) using `views/index.html.twig` and returns the resulting HTML string.
+company info) using `views/index.html.liquid` and returns the resulting HTML string.
 Does not send anything — pass the result to `send()`/`sendMulti()` as the `html`.
 The `<title>` of the document is set to `companyInfo.companyName`.
 
 The promise rejects if:
-- a template fails to render (syntax error, missing include, failing filter);
+- a template fails to render (syntax error, missing partial, unknown or failing filter);
 - any URL field (`companyInfo.logoUrl`, `imageUrl`, `backgroundUrl`, `link`,
   `rows[].imageUrl`, `rows[].link`) uses a scheme other than `http`, `https`, `mailto`,
   `tel` or `cid`. Scheme-less values (`//cdn.example.com/x.png`, `images/x.png`) are
   accepted. The error message names the offending field, e.g.
   `Unsupported URL scheme "javascript" in emailParts[2].link`.
 
-> **Escaping:** text fields are inserted into the HTML as-is (no HTML escaping), and
-> `description` fields are intentionally rendered as raw HTML. Treat every value you pass
-> to `compose()` as trusted content; do not feed it unsanitized user input.
+> **Escaping:** every text field and attribute (`title`, `linkTitle`, `alt`, URLs,
+> `companyName`, `street`, `otherInfo`, …) is HTML-escaped when rendered, so `<`, `>`,
+> `&` and quotes are neutralised (`"` becomes `&#34;`, `'` becomes `&#39;`). The only exceptions are the `description` fields
+> (`OneColText`, `BgImageWithText`, `ThumbnailText`, `rows[].description`), which are
+> intentionally rendered as raw HTML: treat those as trusted content and never build them
+> from unsanitized user input.
 
 #### `CompanyInfo`
 
@@ -337,7 +341,7 @@ const html = await mailer.compose(emailParts, company);
 ### `generateCal(data: EventAttribute): Promise<string>`
 
 Renders an iCalendar (`.ics`) `VEVENT` invite as a string, using
-`views/parts/ical_file.ics.twig`. The result is meant to be passed as
+`views/parts/ical_file.ics.liquid`. The result is meant to be passed as
 `metadata.ical` to `send()` (see below) — `send()` takes care of wrapping it into a
 proper `icalEvent` attachment.
 
@@ -359,11 +363,12 @@ double quotes and control characters removed. `DTSTAMP` is set to the generation
 | `description` | `string` | no | `DESCRIPTION` (plain text; line breaks are preserved as `\n`). |
 | `organizer.name` | `string` | yes | `ORGANIZER;CN="..."`. |
 | `organizer.email` | `string` | yes | `ORGANIZER` `mailto:` address. |
-| `partecipant.email` | `string` | yes | `ATTENDEE` `mailto:` address (also used as `CN`). |
+| `participant.email` | `string` | yes | `ATTENDEE` `mailto:` address (also used as `CN`). |
+| `partecipant.email` | `string` | **deprecated** | Misspelled alias of `participant`, kept for backwards compatibility. Pass one of the two; if both are missing the promise rejects with `EventAttribute.participant is required`. |
 
-Note the field is named `partecipant` (Italian spelling), not `participant`. The
-generated invite always uses `METHOD:REQUEST`, a single attendee, and does not set
-`LOCATION` (left empty).
+The generated invite always uses `METHOD:REQUEST`, a single attendee, and does not set
+`LOCATION` (left empty). Values are **not** HTML-escaped (it's not HTML), only
+iCalendar-escaped as described above.
 
 ```javascript
 const ical = await mailer.generateCal({
@@ -375,7 +380,7 @@ const ical = await mailer.generateCal({
   title: "Meeting",
   description: "Quarterly sync",
   organizer: { name: "Alice", email: "alice@example.com" },
-  partecipant: { email: "bob@example.com" },
+  participant: { email: "bob@example.com" },
 });
 ```
 
@@ -426,7 +431,9 @@ const result = await mailer.send(
 
 Sends a batch of messages back-to-back, only while the pooled SMTP/SES transport
 reports itself idle (`transporter.isIdle()`); it stops (without erroring) as soon as
-`isIdle()` returns `false`. The input array is not modified. A message whose
+`isIdle()` returns `false`. The input array is not modified. Each message is turned into
+mail options exactly like `send()` does (same `sender` header, same recipient
+validation, same `metadata` handling). A message whose recipients are invalid or whose
 `sendMail()` rejects is recorded in `failed` and the batch **continues** with the next
 one; the promise itself only rejects when the transporter is not initialized.
 
@@ -447,9 +454,9 @@ const { sent, failed, remaining } = await mailer.sendMulti(messages);
 |---|---|---|
 | `subject` | `string` | Email subject. |
 | `from` | `string` | Visible `From` address. |
-| `to` | `Array<string>` | Recipient addresses, passed to `nodemailer` as an array. Not validated the way `send()` validates them. |
+| `to` | `Array<string>` | Recipient addresses, validated like in `send()`; an invalid one makes that message land in `failed`. |
 | `html` | `string` | HTML body. |
-| `metadata` | `EmailMetadata` (optional) | **Not translated** — see caveat below. |
+| `metadata` | `EmailMetadata` (optional) | Same semantics as the `metadata` argument of `send()`. |
 
 #### `SendMultiResult`
 
@@ -458,14 +465,6 @@ const { sent, failed, remaining } = await mailer.sendMulti(messages);
 | `sent` | `number` | Messages accepted by the transport. |
 | `failed` | `Array<{ message: EmailMessage; error: Error }>` | Messages the transport rejected, in order. |
 | `remaining` | `EmailMessage[]` | Messages not attempted because `isIdle()` became `false`. |
-
-**Caveat:** unlike `send()`, `sendMulti()` passes each message straight to
-`transporter.sendMail()` without converting `metadata.ical`/`metadata.text`/
-`metadata.attachments` into the `icalEvent`/`text`/`attachments` fields `nodemailer`
-understands. If you need calendar invites, a plain-text alternative, or attachments on
-a batch-sent message, call `send()` in a loop instead of `sendMulti()`, or set
-`icalEvent`/`text`/`attachments` directly on the `EmailMessage` object yourself.
-`sendMulti()` also does **not** set the `sender` header the way `send()` does.
 
 ## Full example
 

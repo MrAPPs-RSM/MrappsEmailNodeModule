@@ -12,6 +12,7 @@ export {
   EmailMessage,
   EmailPartDirection,
   EventAttribute,
+  EventParticipant,
   SendMultiFailure,
   SendMultiResult,
 } from "./mailer";

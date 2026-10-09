@@ -5,7 +5,7 @@
             <span class="mobile-link--footer" style="color: #999999;">{{ companyName }}</span>
             <br/>
             <span class="mobile-link--footer" style="color: #999999;">{{ street }}</span>
-            {% if otherInfo is not empty %}
+            {% if otherInfo != blank %}
                 <br/>
                 <span class="mobile-link--footer" style="color: #999999;">{{ otherInfo }}</span>
             {% endif %}

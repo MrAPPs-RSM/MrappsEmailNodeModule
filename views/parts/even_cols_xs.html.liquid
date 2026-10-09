@@ -1,18 +1,18 @@
 <!-- Two/Three Even Columns (XS: 1/2) -->
-{% if tdStyle is defined and tdStyle=='three_columns' %}
-    {% set tdClass='column-3' %}
-    {% set imgSize=170 %}
+{% if tdStyle == 'three_columns' %}
+    {% assign tdClass = 'column-3' %}
+    {% assign imgSize = 170 %}
 {% else %}
-    {% if xsInvariate is not empty %}
-        {% set tdClass='column-2 xs-invariate' %}
+    {% if xsInvariate %}
+        {% assign tdClass = 'column-2 xs-invariate' %}
     {% else %}
-        {% set tdClass='column-2' %}
+        {% assign tdClass = 'column-2' %}
     {% endif %}
-    {% set imgSize=270 %}
+    {% assign imgSize = 270 %}
 {% endif %}
 <tr>
     <td align="center" valign="top" style="padding: 10px;">
-        {% if title is defined and title is not empty %}
+        {% if title != blank %}
             <table cellspacing="0" cellpadding="0" border="0" width="100%">
                 <tr>
                     <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; padding: 10px; text-align: left;">
@@ -28,13 +28,13 @@
                         <table cellspacing="0" cellpadding="0" border="0">
                             <tr>
                                 <td style="padding: 10px; text-align: center">
-                                    {% if row.link is defined and row.link is not empty %}
+                                    {% if row.link != blank %}
                                         <a href="{{ row.link }}"><img src="{{ row.imageUrl }}" width="{{ imgSize }}"
-                                                                      height="{{ imgSize }}" alt="{{ row.alt|default('') }}" border="0"
+                                                                      height="{{ imgSize }}" alt="{{ row.alt | default: '' }}" border="0"
                                                                       class="fluid"></a>
                                     {% else %}
                                         <img src="{{ row.imageUrl }}" width="{{ imgSize }}" height="{{ imgSize }}"
-                                             alt="{{ row.alt|default('') }}"
+                                             alt="{{ row.alt | default: '' }}"
                                              border="0" class="fluid">
                                     {% endif %}
                                 </td>

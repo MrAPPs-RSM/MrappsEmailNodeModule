@@ -217,23 +217,40 @@ exports[`Mailer compose matches the snapshot for one part of every type 1`] = `
                 <table cellspacing="0" cellpadding="0" border="0" align="center" bgcolor="#222222"
                        width="600" class="email-container"
                        style="-moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); -o-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); -ms-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1); box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);">
-                                                                        <!-- Hero Image, Flush -->
+                    
+                        
+                        
+                            <!-- Hero Image, Flush -->
 <tr>
     <td>
         <img src="https://example.com/hero.png" width="600" height="" alt="Hero" border="0" align="center" style="width: 100%; max-width: 600px;">
     </td>
-</tr>                                                                                                <!-- Hero Image, Flush -->
+</tr>
+
+                        
+                    
+                        
+                        
+                            <!-- Hero Image, Flush -->
 <tr>
     <td style="text-align: center; max-width: 300px;">
         <img src="https://example.com/blocked.png" height="" alt="" border="0" style="max-width: 300px; margin: -20px 0 -10px;">
     </td>
-</tr>                                                                                                <!-- 1 Column Text -->
+</tr>
+
+                        
+                    
+                        
+                        
+                            <!-- 1 Column Text -->
 <tr>
     <td style="padding: 40px; text-align: center; font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: #444444;">
         <h1
             style="text-transform: uppercase; font-size: 18px; color: #555555; margin-top: 0px;">
-            Welcome</h1>        Some <b>HTML</b>
-                    <!-- Button start -->
+            Welcome</h1>
+        Some <b>HTML</b>
+        
+            <!-- Button start -->
             <br/><br/>
             <table cellspacing="0" cellpadding="0" border="0" align="center" style="margin: auto">
                 <tr>
@@ -243,16 +260,25 @@ exports[`Mailer compose matches the snapshot for one part of every type 1`] = `
                            style="background: #666666; border: 15px solid #666666; padding: 0 10px;color: #888888; font-family: sans-serif; font-size: 13px; line-height: 1.1; text-align: center; text-decoration: none; display: block; border-radius: 5px; font-weight: bold;"
                            class="button-a">
                             <!--[if mso]>&nbsp;&nbsp;&nbsp;&nbsp;<![endif]-->
-                                                            Go
-                                                        <!--[if mso]>&nbsp;&nbsp;&nbsp;&nbsp;
+                            
+                                Go
+                            
+                            <!--[if mso]>&nbsp;&nbsp;&nbsp;&nbsp;
                             <![endif]-->
                         </a>
                     </td>
                 </tr>
             </table>
             <!-- Button end -->
-            </td>
-</tr>                                                                                                <!-- Background Image with Text -->
+        
+    </td>
+</tr>
+
+                        
+                    
+                        
+                        
+                            <!-- Background Image with Text -->
 <tr>
     <td background="https://example.com/bg.png" bgcolor="#555555" valign="middle"
         style="text-align: center; background-position: center center !important; background-size: cover !important;">
@@ -277,28 +303,48 @@ exports[`Mailer compose matches the snapshot for one part of every type 1`] = `
         </v:rect>
         <![endif]-->
     </td>
-</tr>                                                                                                                                                            
-                                                                                                                
+</tr>
+
+                        
+                    
+                        
+                        
+                            
+                            
+                                
+                                
+                                    
                                     <!-- Two/Three Even Columns (XS: 1/2) -->
-                    <tr>
+
+    
+        
+    
+    
+
+<tr>
     <td align="center" valign="top" style="padding: 10px;">
-                    <table cellspacing="0" cellpadding="0" border="0" width="100%">
+        
+            <table cellspacing="0" cellpadding="0" border="0" width="100%">
                 <tr>
                     <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; padding: 10px; text-align: left;">
                         <strong style="color:#333333;">Two</strong>
                     </td>
                 </tr>
             </table>
-                <table cellspacing="0" cellpadding="0" border="0" width="100%">
+        
+        <table cellspacing="0" cellpadding="0" border="0" width="100%">
             <tr>
-                                    <td class="column-2 xs-invariate">
+                
+                    <td class="column-2 xs-invariate">
                         <table cellspacing="0" cellpadding="0" border="0">
                             <tr>
                                 <td style="padding: 10px; text-align: center">
-                                                                            <img src="https://example.com/img0.png" width="270" height="270"
+                                    
+                                        <img src="https://example.com/img0.png" width="270" height="270"
                                              alt=""
                                              border="0" class="fluid">
-                                                                    </td>
+                                    
+                                </td>
                             </tr>
                             <tr>
                                 <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: #444444; padding: 0 10px 10px; text-align: left;"
@@ -308,14 +354,17 @@ exports[`Mailer compose matches the snapshot for one part of every type 1`] = `
                             </tr>
                         </table>
                     </td>
-                                    <td class="column-2 xs-invariate">
+                
+                    <td class="column-2 xs-invariate">
                         <table cellspacing="0" cellpadding="0" border="0">
                             <tr>
                                 <td style="padding: 10px; text-align: center">
-                                                                            <img src="https://example.com/img1.png" width="270" height="270"
+                                    
+                                        <img src="https://example.com/img1.png" width="270" height="270"
                                              alt=""
                                              border="0" class="fluid">
-                                                                    </td>
+                                    
+                                </td>
                             </tr>
                             <tr>
                                 <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: #444444; padding: 0 10px 10px; text-align: left;"
@@ -325,24 +374,44 @@ exports[`Mailer compose matches the snapshot for one part of every type 1`] = `
                             </tr>
                         </table>
                     </td>
-                            </tr>
+                
+            </tr>
         </table>
     </td>
-</tr>                                                                                                                                                                                            
-                                                                                                                
+</tr>
+
+                                    
+                                
+                            
+                                
+                                
+                            
+                                
+                                
+                                    
                                     <!-- Two/Three Even Columns (XS: 1/2) -->
-                    <tr>
+
+    
+        
+    
+    
+
+<tr>
     <td align="center" valign="top" style="padding: 10px;">
-                <table cellspacing="0" cellpadding="0" border="0" width="100%">
+        
+        <table cellspacing="0" cellpadding="0" border="0" width="100%">
             <tr>
-                                    <td class="column-2 xs-invariate">
+                
+                    <td class="column-2 xs-invariate">
                         <table cellspacing="0" cellpadding="0" border="0">
                             <tr>
                                 <td style="padding: 10px; text-align: center">
-                                                                            <img src="https://example.com/img2.png" width="270" height="270"
+                                    
+                                        <img src="https://example.com/img2.png" width="270" height="270"
                                              alt=""
                                              border="0" class="fluid">
-                                                                    </td>
+                                    
+                                </td>
                             </tr>
                             <tr>
                                 <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: #444444; padding: 0 10px 10px; text-align: left;"
@@ -352,30 +421,53 @@ exports[`Mailer compose matches the snapshot for one part of every type 1`] = `
                             </tr>
                         </table>
                     </td>
-                            </tr>
+                
+            </tr>
         </table>
     </td>
-</tr>                                                                                                                                                                                                                                                                                                                                                                            
+</tr>
+
+                                    
+                                
+                            
+                        
+                    
+                        
+                        
+                            
+                            
+                                
+                                
+                                    
                                     <!-- Two/Three Even Columns (XS: 1/2) -->
-        <tr>
+
+    
+    
+
+<tr>
     <td align="center" valign="top" style="padding: 10px;">
-                    <table cellspacing="0" cellpadding="0" border="0" width="100%">
+        
+            <table cellspacing="0" cellpadding="0" border="0" width="100%">
                 <tr>
                     <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; padding: 10px; text-align: left;">
                         <strong style="color:#333333;">Three</strong>
                     </td>
                 </tr>
             </table>
-                <table cellspacing="0" cellpadding="0" border="0" width="100%">
+        
+        <table cellspacing="0" cellpadding="0" border="0" width="100%">
             <tr>
-                                    <td class="column-3">
+                
+                    <td class="column-3">
                         <table cellspacing="0" cellpadding="0" border="0">
                             <tr>
                                 <td style="padding: 10px; text-align: center">
-                                                                            <img src="https://example.com/img0.png" width="170" height="170"
+                                    
+                                        <img src="https://example.com/img0.png" width="170" height="170"
                                              alt=""
                                              border="0" class="fluid">
-                                                                    </td>
+                                    
+                                </td>
                             </tr>
                             <tr>
                                 <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: #444444; padding: 0 10px 10px; text-align: left;"
@@ -385,14 +477,17 @@ exports[`Mailer compose matches the snapshot for one part of every type 1`] = `
                             </tr>
                         </table>
                     </td>
-                                    <td class="column-3">
+                
+                    <td class="column-3">
                         <table cellspacing="0" cellpadding="0" border="0">
                             <tr>
                                 <td style="padding: 10px; text-align: center">
-                                                                            <img src="https://example.com/img1.png" width="170" height="170"
+                                    
+                                        <img src="https://example.com/img1.png" width="170" height="170"
                                              alt=""
                                              border="0" class="fluid">
-                                                                    </td>
+                                    
+                                </td>
                             </tr>
                             <tr>
                                 <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: #444444; padding: 0 10px 10px; text-align: left;"
@@ -402,14 +497,17 @@ exports[`Mailer compose matches the snapshot for one part of every type 1`] = `
                             </tr>
                         </table>
                     </td>
-                                    <td class="column-3">
+                
+                    <td class="column-3">
                         <table cellspacing="0" cellpadding="0" border="0">
                             <tr>
                                 <td style="padding: 10px; text-align: center">
-                                                                            <img src="https://example.com/img2.png" width="170" height="170"
+                                    
+                                        <img src="https://example.com/img2.png" width="170" height="170"
                                              alt=""
                                              border="0" class="fluid">
-                                                                    </td>
+                                    
+                                </td>
                             </tr>
                             <tr>
                                 <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: #444444; padding: 0 10px 10px; text-align: left;"
@@ -419,23 +517,45 @@ exports[`Mailer compose matches the snapshot for one part of every type 1`] = `
                             </tr>
                         </table>
                     </td>
-                            </tr>
+                
+            </tr>
         </table>
     </td>
-</tr>                                                                                                                                                                                                                                                                                                                                                                        
+</tr>
+
+                                    
+                                
+                            
+                                
+                                
+                            
+                                
+                                
+                            
+                                
+                                
+                                    
                                     <!-- Two/Three Even Columns (XS: 1/2) -->
-        <tr>
+
+    
+    
+
+<tr>
     <td align="center" valign="top" style="padding: 10px;">
-                <table cellspacing="0" cellpadding="0" border="0" width="100%">
+        
+        <table cellspacing="0" cellpadding="0" border="0" width="100%">
             <tr>
-                                    <td class="column-3">
+                
+                    <td class="column-3">
                         <table cellspacing="0" cellpadding="0" border="0">
                             <tr>
                                 <td style="padding: 10px; text-align: center">
-                                                                            <img src="https://example.com/img3.png" width="170" height="170"
+                                    
+                                        <img src="https://example.com/img3.png" width="170" height="170"
                                              alt=""
                                              border="0" class="fluid">
-                                                                    </td>
+                                    
+                                </td>
                             </tr>
                             <tr>
                                 <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: #444444; padding: 0 10px 10px; text-align: left;"
@@ -445,14 +565,17 @@ exports[`Mailer compose matches the snapshot for one part of every type 1`] = `
                             </tr>
                         </table>
                     </td>
-                                    <td class="column-3">
+                
+                    <td class="column-3">
                         <table cellspacing="0" cellpadding="0" border="0">
                             <tr>
                                 <td style="padding: 10px; text-align: center">
-                                                                            <a href="https://example.com/r"><img src="https://example.com/l.png" width="170"
+                                    
+                                        <a href="https://example.com/r"><img src="https://example.com/l.png" width="170"
                                                                       height="170" alt="L" border="0"
                                                                       class="fluid"></a>
-                                                                    </td>
+                                    
+                                </td>
                             </tr>
                             <tr>
                                 <td style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: #444444; padding: 0 10px 10px; text-align: left;"
@@ -462,11 +585,27 @@ exports[`Mailer compose matches the snapshot for one part of every type 1`] = `
                             </tr>
                         </table>
                     </td>
-                            </tr>
+                
+            </tr>
         </table>
     </td>
-</tr>                                                                                                                                                                                                                                                            <!-- Thumbnail Left/Right, Text Right/Left -->
-    <tr>
+</tr>
+
+                                    
+                                
+                            
+                                
+                                
+                            
+                        
+                    
+                        
+                        
+                            <!-- Thumbnail Left/Right, Text Right/Left -->
+
+    
+
+<tr>
     <td dir="ltr" align="center" valign="top" width="100%" style="padding: 10px;">
         <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
             <tr>
@@ -486,11 +625,16 @@ exports[`Mailer compose matches the snapshot for one part of every type 1`] = `
                             <td dir="ltr" valign="top"
                                 style="font-family: sans-serif; font-size: 15px; mso-height-rule: exactly; color: #444444; padding: 10px; text-align: left;"
                                 class="center-on-narrow">
-                                                                    <strong style="color:#333333;">Thumb</strong>
-                                    <br/>
-                                                                                                    Desc
                                 
-                                                                    <!-- Button start -->
+                                    <strong style="color:#333333;">Thumb</strong>
+                                    <br/>
+                                
+                                
+                                    Desc
+                                
+
+                                
+                                    <!-- Button start -->
                                     <br/><br/>
                                     <table cellspacing="0" cellpadding="0" border="0" class="center-on-narrow"
                                            style="float:left;">
@@ -501,25 +645,38 @@ exports[`Mailer compose matches the snapshot for one part of every type 1`] = `
                                                    style="background: #555555; border: 15px solid #555555; padding: 0 10px;color: #888888; font-family: sans-serif; font-size: 13px; line-height: 1.1; text-align: center; text-decoration: none; display: block; border-radius: 5px; font-weight: bold;"
                                                    class="button-a">
                                                     <!--[if mso]>&nbsp;&nbsp;&nbsp;&nbsp;<![endif]-->
-                                                                                                            Go now
-                                                                                                        <!--[if mso]>&nbsp;&nbsp;&nbsp;&nbsp;<![endif]-->
+                                                    
+                                                        Go now
+                                                    
+                                                    <!--[if mso]>&nbsp;&nbsp;&nbsp;&nbsp;<![endif]-->
                                                 </a>
                                             </td>
                                         </tr>
                                     </table>
                                     <!-- Button end -->
-                                                            </td>
+                                
+                            </td>
                         </tr>
                     </table>
                 </td>
             </tr>
         </table>
     </td>
-</tr>                                                                                                <!-- Border -->
+</tr>
+
+                        
+                    
+                        
+                        
+                            <!-- Border -->
 <tr>
     <td style="padding: 0 40px; height: 2px; background-color: #dddddd;">
     </td>
-</tr>                                                            </table>
+</tr>
+
+                        
+                    
+                </table>
                 <!-- Email Footer -->
 <table align="center" width="600" class="email-container">
     <tr>
@@ -527,11 +684,15 @@ exports[`Mailer compose matches the snapshot for one part of every type 1`] = `
             <span class="mobile-link--footer" style="color: #999999;">Acme Inc.</span>
             <br/>
             <span class="mobile-link--footer" style="color: #999999;">123 Main St</span>
-                            <br/>
+            
+                <br/>
                 <span class="mobile-link--footer" style="color: #999999;">VAT 123</span>
-                    </td>
+            
+        </td>
     </tr>
-</table>            </center>
+</table>
+
+            </center>
         </td>
     </tr>
 </table>

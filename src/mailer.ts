@@ -1,8 +1,9 @@
 import * as nodemailer from "nodemailer";
-import * as twig from "twig";
+import { Liquid } from "liquidjs";
 import path from "path";
 import { Readable } from "stream";
 import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
+import { icsEscape, icsParam, truncate } from "./filters";
 
 export enum TransportType {
   SMTP = "SMTP",
@@ -72,7 +73,11 @@ export interface CompanyInfo {
   otherInfo?: string;
 }
 
-export interface EventAttribute {
+export interface EventParticipant {
+  email: string;
+}
+
+interface EventAttributeBase {
   start: string;
   end: string;
   uid: string;
@@ -84,10 +89,17 @@ export interface EventAttribute {
     name: string;
     email: string;
   };
-  partecipant: {
-    email: string;
-  };
 }
+
+export type EventAttribute = EventAttributeBase &
+  (
+    | { participant: EventParticipant; partecipant?: undefined }
+    | {
+        /** @deprecated misspelling kept for backwards compatibility, use `participant` */
+        partecipant: EventParticipant;
+        participant?: undefined;
+      }
+  );
 
 interface AttachmentLike {
   content?: string | Buffer | Readable;
@@ -131,30 +143,26 @@ export interface SendMultiResult {
 }
 
 const DEFAULT_AWS_REGION = "eu-west-1";
-const DEFAULT_TRUNCATE_LENGTH = 10;
 const ALLOWED_URL_SCHEMES = new Set(["http", "https", "mailto", "tel", "cid"]);
 const ICS_MAX_LINE_OCTETS = 75;
+const VIEWS_ROOT = path.resolve(__dirname, "../views");
 
-twig.extendFilter("truncate", (value: unknown, params: false | any[]) => {
-  const text = value == null ? "" : String(value);
-  const length =
-    Array.isArray(params) && params.length > 0 ? params[0] : DEFAULT_TRUNCATE_LENGTH;
-  return text.length > length ? text.substring(0, length) + "..." : text;
-});
+function createEngine(escapeOutput: boolean): Liquid {
+  const engine = new Liquid({
+    root: VIEWS_ROOT,
+    cache: true,
+    jsTruthy: true,
+    strictFilters: true,
+    ...(escapeOutput ? { outputEscape: "escape" as const } : {}),
+  });
+  engine.registerFilter("truncate", truncate);
+  engine.registerFilter("ics_escape", icsEscape);
+  engine.registerFilter("ics_param", icsParam);
+  return engine;
+}
 
-// RFC 5545 §3.3.11: escape backslash, semicolon, comma and line breaks in TEXT values.
-twig.extendFilter("ics_escape", (value: unknown) =>
-  (value == null ? "" : String(value))
-    .replace(/\\/g, "\\\\")
-    .replace(/;/g, "\\;")
-    .replace(/,/g, "\\,")
-    .replace(/\r\n|\r|\n/g, "\\n")
-);
-
-// RFC 5545 §3.2: parameter values are always emitted quoted, so only DQUOTE and control characters are illegal.
-twig.extendFilter("ics_param", (value: unknown) =>
-  (value == null ? "" : String(value)).replace(/["\x00-\x1f\x7f]/g, "")
-);
+const htmlEngine = createEngine(true);
+const icsEngine = createEngine(false);
 
 function assertSafeUrl(value: string | undefined, field: string): void {
   if (!value) {
@@ -301,7 +309,7 @@ export class Mailer {
       });
     });
 
-    return this.renderTemplate("../views/index.html.twig", {
+    return htmlEngine.renderFileSync("index.html.liquid", {
       settings: {
         ...this.style,
         logoUrl: companyInfo.logoUrl,
@@ -314,8 +322,13 @@ export class Mailer {
   }
 
   async generateCal(data: EventAttribute): Promise<string> {
-    const rendered = this.renderTemplate("../views/parts/ical_file.ics.twig", {
-      settings: { ...data, dtstamp: icsTimestamp(new Date()) },
+    const participant = data.participant ?? data.partecipant;
+    if (!participant) {
+      throw new Error("EventAttribute.participant is required");
+    }
+
+    const rendered: string = icsEngine.renderFileSync("parts/ical_file.ics.liquid", {
+      settings: { ...data, participant, dtstamp: icsTimestamp(new Date()) },
     });
 
     return rendered
@@ -337,41 +350,7 @@ export class Mailer {
       throw new Error("Transporter not initialized");
     }
 
-    to.forEach(assertRecipient);
-
-    let options: nodemailer.SendMailOptions = {
-      to,
-      subject,
-      sender: this.sourceAddress,
-      from: from,
-      html,
-    };
-
-    if (metadata?.ical) {
-      options = {
-        ...options,
-        icalEvent: {
-          method: "request",
-          filename: "invitation.ics",
-          content: metadata.ical,
-        },
-      };
-    }
-
-    if (metadata?.text) {
-      options = {
-        ...options,
-        text: metadata.text,
-      };
-    }
-
-    if (metadata?.attachments) {
-      options = {
-        ...options,
-        attachments: metadata.attachments,
-      };
-    }
-    return await this.transporter.sendMail(options);
+    return this.transporter.sendMail(this.buildMailOptions(subject, from, to, html, metadata));
   }
 
   async sendMulti(messages: EmailMessage[]): Promise<SendMultiResult> {
@@ -386,7 +365,9 @@ export class Mailer {
     while (index < messages.length && this.transporter.isIdle()) {
       const message = messages[index];
       try {
-        await this.transporter.sendMail(message);
+        await this.transporter.sendMail(
+          this.buildMailOptions(message.subject, message.from, message.to, message.html, message.metadata)
+        );
         result.sent++;
       } catch (error) {
         result.failed.push({
@@ -401,12 +382,39 @@ export class Mailer {
     return result;
   }
 
-  private renderTemplate(relativePath: string, context: Record<string, unknown>): string {
-    const params: twig.Parameters & { rethrow: boolean } = {
-      path: path.resolve(__dirname, relativePath),
-      async: false,
-      rethrow: true,
+  private buildMailOptions(
+    subject: string,
+    from: string,
+    to: Array<string>,
+    html: string,
+    metadata?: EmailMetadata
+  ): nodemailer.SendMailOptions {
+    to.forEach(assertRecipient);
+
+    const options: nodemailer.SendMailOptions = {
+      to,
+      subject,
+      sender: this.sourceAddress,
+      from,
+      html,
     };
-    return String(twig.twig(params).render(context));
+
+    if (metadata?.ical) {
+      options.icalEvent = {
+        method: "request",
+        filename: "invitation.ics",
+        content: metadata.ical,
+      };
+    }
+
+    if (metadata?.text) {
+      options.text = metadata.text;
+    }
+
+    if (metadata?.attachments) {
+      options.attachments = metadata.attachments;
+    }
+
+    return options;
   }
 }

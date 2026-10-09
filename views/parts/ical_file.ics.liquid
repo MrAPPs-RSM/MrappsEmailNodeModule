@@ -9,7 +9,7 @@ DTEND:{{ settings.end | ics_escape }}
 DTSTAMP:{{ settings.dtstamp }}
 ORGANIZER;CN="{{ settings.organizer.name | ics_param }}":mailto:{{ settings.organizer.email | ics_escape }}
 UID:{{ settings.uid | ics_escape }}
-ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN="{{ settings.partecipant.email | ics_param }}";X-NUM-GUESTS=0:mailto:{{ settings.partecipant.email | ics_escape }}
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=TRUE;CN="{{ settings.participant.email | ics_param }}";X-NUM-GUESTS=0:mailto:{{ settings.participant.email | ics_escape }}
 X-MICROSOFT-CDO-OWNERAPPTID:307924667
 CREATED:{{ settings.created | ics_escape }}
 DESCRIPTION:{{ settings.description | ics_escape }}

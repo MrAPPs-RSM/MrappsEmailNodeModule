@@ -1,5 +1,6 @@
 import * as nodemailer from "nodemailer";
-import * as twig from "twig";
+import { Liquid } from "liquidjs";
+import { icsEscape, icsParam, truncate } from "../src/filters";
 import {
   Mailer,
   Configuration,
@@ -19,16 +20,13 @@ jest.mock("nodemailer", () => {
   };
 });
 
-jest.mock("twig", () => {
-  const actual = jest.requireActual("twig");
-  return {
-    ...actual,
-    twig: jest.fn(actual.twig),
-  };
-});
-
 const createTransportMock = nodemailer.createTransport as jest.Mock;
-const twigMock = twig.twig as unknown as jest.Mock;
+
+function failNextRender(message: string) {
+  jest.spyOn(Liquid.prototype, "renderFileSync").mockImplementationOnce(() => {
+    throw new Error(message);
+  });
+}
 
 function fakeTransporter() {
   return {
@@ -64,7 +62,7 @@ const event: EventAttribute = {
   lastModified: "20260101T000000Z",
   title: "Meeting",
   organizer: { name: "Alice", email: "alice@example.com" },
-  partecipant: { email: "bob@example.com" },
+  participant: { email: "bob@example.com" },
 };
 
 function rows(count: number) {
@@ -384,7 +382,8 @@ describe("Mailer", () => {
       const result = await mailer.sendMulti(messages);
 
       expect(transporter.sendMail).toHaveBeenCalledTimes(2);
-      expect(transporter.sendMail).toHaveBeenNthCalledWith(1, messages[0]);
+      expect(transporter.sendMail).toHaveBeenNthCalledWith(1, expect.objectContaining({ subject: "A", to: ["to@example.com"] }));
+      expect(transporter.sendMail).toHaveBeenNthCalledWith(2, expect.objectContaining({ subject: "B" }));
       expect(result).toEqual({ sent: 2, failed: [], remaining: [] });
       expect(messages).toHaveLength(2);
     });
@@ -438,6 +437,46 @@ describe("Mailer", () => {
       expect(result.failed).toHaveLength(1);
       expect(result.failed[0].error).toBeInstanceOf(Error);
       expect(result.failed[0].error.message).toBe("plain string failure");
+    });
+
+    it("builds the same mail options as send(): sender, icalEvent, text and attachments", async () => {
+      const transporter = fakeTransporter();
+      createTransportMock.mockReturnValue(transporter);
+      const mailer = new Mailer({ transport: TransportType.SMTP, host: "h", port: 25, user: "sender@example.com" });
+
+      await mailer.sendMulti([
+        {
+          ...message("A"),
+          metadata: { ical: "BEGIN:VCALENDAR", text: "plain", attachments: [{ filename: "f.txt", content: "c" }] },
+        },
+      ]);
+
+      expect(transporter.sendMail).toHaveBeenCalledWith({
+        to: ["to@example.com"],
+        subject: "A",
+        sender: "sender@example.com",
+        from: "from@example.com",
+        html: "<p>A</p>",
+        icalEvent: { method: "request", filename: "invitation.ics", content: "BEGIN:VCALENDAR" },
+        text: "plain",
+        attachments: [{ filename: "f.txt", content: "c" }],
+      });
+      expect(transporter.sendMail.mock.calls[0][0]).not.toHaveProperty("metadata");
+    });
+
+    it("records a message with an invalid recipient as failed without calling sendMail for it", async () => {
+      const transporter = fakeTransporter();
+      const mailer = new Mailer();
+      mailer.setTransporter(transporter as unknown as nodemailer.Transporter);
+      const bad = { ...message("bad"), to: ["a@example.com, b@example.com"] };
+
+      const result = await mailer.sendMulti([bad, message("good")]);
+
+      expect(transporter.sendMail).toHaveBeenCalledTimes(1);
+      expect(result.sent).toBe(1);
+      expect(result.failed).toHaveLength(1);
+      expect(result.failed[0].message).toBe(bad);
+      expect(result.failed[0].error.message).toContain("Invalid recipient address");
     });
   });
 
@@ -583,7 +622,7 @@ describe("Mailer", () => {
       expect(withoutTitle.split("https://example.com/go")).toHaveLength(3);
     });
 
-    it("truncates long text through the twig 'truncate' filter", async () => {
+    it("truncates long text through the 'truncate' template filter", async () => {
       const longTitle = "A".repeat(120);
       const shortDescription = "short description";
 
@@ -598,9 +637,9 @@ describe("Mailer", () => {
     });
 
     it("defaults the truncate filter length to 10 when no argument is passed", () => {
-      const rendered = twig.twig({ data: "{{ text | truncate }}" }).render({ text: "this is a much longer string than ten characters" });
-
-      expect(rendered).toBe("this is a ...");
+      expect(truncate("this is a much longer string than ten characters")).toBe("this is a ...");
+      expect(truncate("short")).toBe("short");
+      expect(truncate(null)).toBe("");
     });
 
     it.each([
@@ -630,10 +669,46 @@ describe("Mailer", () => {
       expect(html).toContain('src="cid:inline-image"');
     });
 
+    it("HTML-escapes text fields and attributes while keeping description raw", async () => {
+      const html = await new Mailer().compose(
+        [
+          {
+            type: EmailPartType.OneColText,
+            title: '<b>Bold "title"</b>',
+            description: "<b>raw</b> & kept",
+            link: "https://example.com/?a=1&b=2",
+            linkTitle: "<i>Go</i>",
+          },
+          { type: EmailPartType.Image, imageUrl: "https://example.com/i.png?x=1&y=2", alt: 'Say "hi"' },
+          { type: EmailPartType.BgImageWithText, backgroundUrl: "https://example.com/bg.png", description: "<em>overlay</em>" },
+          { type: EmailPartType.ThumbnailText, imageUrl: "https://example.com/t.png", title: "<u>T</u>", description: "<b>thumb</b> raw" },
+          { type: EmailPartType.TwoEvenColsXs, title: "<s>cols</s>", rows: [{ imageUrl: "https://example.com/r.png", description: "<b>row</b>" }] },
+        ],
+        { logoUrl: "https://example.com/logo.png?a=1&b=2", companyName: "<script>alert(1)</script>", street: "Via <x>", otherInfo: "P.IVA & co" }
+      );
+
+      expect(html).not.toContain("<script>");
+      expect(html).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
+      expect(html).toContain("<title>&lt;script&gt;alert(1)&lt;/script&gt;</title>");
+      expect(html).toContain('alt="&lt;script&gt;alert(1)&lt;/script&gt;"');
+      expect(html).toContain("Via &lt;x&gt;");
+      expect(html).toContain("P.IVA &amp; co");
+      expect(html).toContain("&lt;b&gt;Bold &#34;title&#34;&lt;/b&gt;");
+      expect(html).toContain("&lt;i&gt;Go&lt;/i&gt;");
+      expect(html).toContain("&lt;u&gt;T&lt;/u&gt;");
+      expect(html).toContain("&lt;s&gt;cols&lt;/s&gt;");
+      expect(html).toContain('href="https://example.com/?a=1&amp;b=2"');
+      expect(html).toContain('src="https://example.com/i.png?x=1&amp;y=2"');
+      expect(html).toContain('src="https://example.com/logo.png?a=1&amp;b=2"');
+      expect(html).toContain('alt="Say &#34;hi&#34;"');
+      expect(html).toContain("<b>raw</b> & kept");
+      expect(html).toContain("<em>overlay</em>");
+      expect(html).toContain("<b>thumb</b> raw");
+      expect(html).toContain("<b>row</b>");
+    });
+
     it("rejects when the template fails to render", async () => {
-      twigMock.mockImplementationOnce(() => {
-        throw new Error("template blew up");
-      });
+      failNextRender("template blew up");
 
       await expect(new Mailer().compose([], companyInfo)).rejects.toThrow("template blew up");
     });
@@ -690,12 +765,32 @@ describe("Mailer", () => {
       expect(ics).not.toMatch(/^ATTENDEE:evil/m);
     });
 
-    it("renders null/undefined values as empty strings in the ics filters", () => {
-      const rendered = twig
-        .twig({ data: "[{{ missing | ics_escape }}][{{ missing | ics_param }}][{{ nothing | ics_param }}]" })
-        .render({ nothing: null });
+    it("still accepts the deprecated 'partecipant' spelling", async () => {
+      const { participant, ...rest } = event;
+      const ics = await new Mailer().generateCal({ ...rest, partecipant: participant! });
 
-      expect(rendered).toBe("[][][]");
+      expect(ics).toContain('CN="bob@example.com";X-NUM-GUESTS=0:mailto:bob@example.com');
+    });
+
+    it("rejects when neither participant nor partecipant is given", async () => {
+      const { participant, ...rest } = event;
+
+      await expect(new Mailer().generateCal(rest as unknown as EventAttribute)).rejects.toThrow(
+        "EventAttribute.participant is required"
+      );
+    });
+
+    it("does not HTML-escape ics values", async () => {
+      const ics = await new Mailer().generateCal({ ...event, title: 'A & B <"C">' });
+
+      expect(ics).toContain('SUMMARY:A & B <"C">');
+    });
+
+    it("renders null/undefined values as empty strings in the ics filters", () => {
+      expect(icsEscape(undefined)).toBe("");
+      expect(icsEscape(null)).toBe("");
+      expect(icsParam(undefined)).toBe("");
+      expect(icsParam(null)).toBe("");
     });
 
     it("folds lines longer than 75 octets and unfolds back to the original text", async () => {
@@ -709,9 +804,7 @@ describe("Mailer", () => {
     });
 
     it("rejects when the template fails to render", async () => {
-      twigMock.mockImplementationOnce(() => {
-        throw new Error("ics template blew up");
-      });
+      failNextRender("ics template blew up");
 
       await expect(new Mailer().generateCal(event)).rejects.toThrow("ics template blew up");
     });
