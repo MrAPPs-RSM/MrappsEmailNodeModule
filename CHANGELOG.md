@@ -1,3 +1,19 @@
+# [4.0.0](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.6.0...4.0.0) (2026-10-09)
+
+
+* feat!: HTML autoescaping, unified sendMulti, LiquidJS template engine BREAKING CHANGE: compose() HTML-escapes title, linkTitle, alt, URL and company fields; HTML passed in those fields is now rendered literally. Move any markup to the description fields. ([de0f0cc](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/commit/de0f0cc2cf5c15835281b895b292a68e44bcc0cc)), closes [#34](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/issues/34)
+
+
+### BREAKING CHANGES
+
+* compose() HTML-escapes title, linkTitle, alt, URL and
+company fields; HTML passed in those fields is now rendered literally.
+Move any markup to the description fields.
+* sendMulti() emails now carry the `sender` header and
+honour `metadata` (icalEvent/text/attachments); recipients are validated
+and failures are reported in the result instead of being sent as-is.
+* generated HTML whitespace differs and double quotes are
+
 # [3.6.0](https://github.com/MrAPPs-RSM/MrappsEmailNodeModule/compare/3.5.8...3.6.0) (2026-10-09)
 
 
